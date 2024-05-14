@@ -25,4 +25,30 @@ public class Move
     {
         return id;
     }
+
+    public String getName()
+    {
+        return name;
+    }
+
+    public int getDamage()
+    {
+        return damage;
+    }
+
+    public int getAccuracy()
+    {
+        return accuracy;
+    }
+
+    public void useMove()
+    {
+        this.usages-=1;
+    }
+
+    public int usagesLeft()
+    {
+        int usagesLeft = max_usages - usages;
+        return usagesLeft;
+    }
 }

@@ -1,20 +1,23 @@
 package csv_handling;
 
 import elements.ConPalmonMove;
+import elements.Effectivity;
 import elements.Move;
 import elements.Palmon;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.util.ArrayList;
 import java.util.HashMap;
 
-public class CSV_Reader extends Thread // extends Thread
+public class CSV_Reader // extends Thread
 {
     // Paths
-    final String path_palmon = "C://Users//Fey//IdeaProjects//Programmierprojekt//src//Data_Sources//palmon.csv"; // Path Palmon
-    final String path_move = "C://Users//Fey//IdeaProjects//Programmierprojekt//src//Data_Sources//moves.csv";
-    final String path_palmonmove = "C://Users//Fey//IdeaProjects//Programmierprojekt//src//palmon_move.csv";
+    final String path_palmon = "C://Users//Fey//IdeaProjects//AA_Latest_Palmon//src//csv_dateien//palmon.csv"; // Path Palmon
+    final String path_move = "C://Users//Fey//IdeaProjects//AA_Latest_Palmon//src//csv_dateien//moves.csv";
+    String path_effectivity  = "C://Users//Fey//IdeaProjects//AA_Latest_Palmon//src//csv_dateien//effectivity.csv";
+    // final String path_palmonmove = "C://Users//Fey//IdeaProjects//AA_Latest_Palmon//src//csv_dateien//palmon_move.csv";
 
     // HashMaps
     public HashMap <Integer, Palmon> palmon_db = new HashMap <>(); // Storage medium for Palmon, Key: ID
@@ -23,13 +26,17 @@ public class CSV_Reader extends Thread // extends Thread
     public HashMap<Integer, ConPalmonMove> palsMoves = new HashMap<>(); // All Moves for the Palmon, Key: Palmon ID
     public HashMap<Integer, ConPalmonMove> movesForPals = new HashMap<>(); // All Moves listed with further information out of CSV PalmonMove, Key: Move ID
 
+    // ArrayLists
+    ArrayList<Effectivity> effectivity_db  = new ArrayList <>(); // Storage medium for Effectivity
+
+    // @Override
     public void run()
     {
         CSV_Reader reader = new CSV_Reader();
         reader.PalmonDataReader();
         reader.MoveDataReader();
-        reader.PalmonMoveDataReader();
-
+        // reader.PalmonMoveDataReader();
+        reader.EffectivityDataReader();
     }
 
     public void PalmonDataReader()
@@ -104,49 +111,50 @@ public class CSV_Reader extends Thread // extends Thread
         }
     }
 
-    public void PalmonMoveDataReader()
+    public void EffectivityDataReader()
     {
-        Palmon palmon;
-        Move move;
-        int level;
-
-        try (BufferedReader br = new BufferedReader(new FileReader(path_palmon)))
+        try (BufferedReader br = new BufferedReader(new FileReader(path_effectivity))) // setting up the Buffered Reader
         {
-            boolean reading = true;
-            br.readLine(); // skipped: not needed since it is a header
-            String dataset; // current record of the CSV
+            boolean keep_reading = true;
+            String header = br.readLine(); // first line is skipped since its a header
+            String effectivity; // temporary variable for the current record
 
-            while(reading) // reads until there are no more records available.
+            while(keep_reading) // as long as there is still another record
             {
-                dataset = br.readLine(); // for storing the current line of the CSV file
+                effectivity = br.readLine(); // temporarily storing the current line
 
-                if(dataset == null) // if the current record is empty
+                if(effectivity == null) // if the current record is empty
                 {
-                    reading = false; // reading is set to false and the loop doesn't execute another iteration
+                    keep_reading = false; // loop does not execute a new iteration.
                 }
                 else
                 {
-                    String [] palmonMoveDetails = dataset.split(";"); // splitting the dataset into its pieces
+                    // splitting the record in its attributes
+                    String [] effectivitydetails = effectivity.split(";");
 
-                    palmon = palmon_db.get(Integer.parseInt(palmonMoveDetails[0]));
-                    move = move_db.get(Integer.parseInt(palmonMoveDetails[1]));
-                    level = Integer.parseInt(palmonMoveDetails[2]);
+                    // Converting some attributes to int, storing the rest for clarity (see Effectivity constructor)
+                    String damage_factor_percentage = effectivitydetails[2]; // Storage initially in a String because of %.
+                    String damage_factor_nopercentage = damage_factor_percentage.replace("%", ""); // String without the %
+                    double damage_factor_ohne_percentage_converted = Double.parseDouble(damage_factor_nopercentage); // String conversion
+                    double damage_factor = damage_factor_ohne_percentage_converted / 100.0; // Final variable for percentage calculation
 
-                    ConPalmonMove conpalmonmove = new ConPalmonMove(palmon, move, level);
+                    Effectivity e1 = new Effectivity(effectivitydetails[0], effectivitydetails[1], damage_factor);
 
-                    palsMoves.put(palmon.getId(), conpalmonmove);
-                    movesForPals.put(move.getId(), conpalmonmove);
+                    // Effectivity is threaded into the ArrayList
+                    effectivity_db.add(e1);
                 }
             }
         }
         catch (FileNotFoundException e)
-        { // applies when there is no file
-            System.err.println("The PalmonMove file was not found. Please check the file path and restart the program.");
-            System.exit(0); // ends the program
+        {
+            // if the path is incorrect
+            System.err.println("Needed Effectivity file was not found. Please check the file and restart the program. Crying would be a possibility as well.");
+            System.exit(0); // Beendet das Programm
         }
         catch(Exception e)
         {
-            System.out.println("Unexpected issue (PalmonMove). Please contact support (and run screaming in circles).");
+            // if an unexpected error is occuring
+            System.out.println("Unexpected issue (while reading and saving the Effectivity). Please contact support (and run screaming in circles).");
         }
     }
 }

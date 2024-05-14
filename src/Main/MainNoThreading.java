@@ -5,7 +5,7 @@ import csv_handling.CSV_Reader;
 import csv_handling.CSV_Searching;
 import data_structures.Printing;
 
-public class Main
+public class MainNoThreading
 {
     public static void main(String[] args) throws InterruptedException {
         // Erstellen der Instanzen der Klassen
@@ -15,10 +15,9 @@ public class Main
         Game game = new Game(data, selection, print);
 
         // Erstellen und Starten der Threads für jede Klasse
-        // data.start();
-
-            Thread.sleep(1000);
-
-        // game.start();
+        data.run();
+        data.PalmonDataReader();
+        data.MoveDataReader();
+        game.run();
     }
 }

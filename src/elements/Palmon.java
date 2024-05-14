@@ -7,7 +7,7 @@ public class Palmon // constructor
     final int height;
     final int weight;
     final String[] type = new String[2];
-    int hp;
+    double hp;
     final int attack;
     final int defense;
     final int speed;
@@ -21,22 +21,22 @@ public class Palmon // constructor
         weight  = Integer.parseInt(palmondetails[3]);
         type[0] = palmondetails[4];
         type[1] = palmondetails[5];
-        hp      = Integer.parseInt(palmondetails[6]);
+        hp      = Double.parseDouble(palmondetails[6]);
         attack  = Integer.parseInt(palmondetails[7]);
         defense = Integer.parseInt(palmondetails[8]);
         speed   = Integer.parseInt(palmondetails[9]);
     }
 
-    public boolean speedTest(Palmon player, Palmon enemy)
+    public boolean speedTest(Palmon enemy)
     {
-        boolean enemyfaster = false;
+        boolean palmonFaster = false; // if boolean is true, player is faster
 
         // if enemys speed is higher than players speed, enemy starts
-        if(player.speed < enemy.speed)
+        if(speed > enemy.speed)
         {
-            enemyfaster = true;
+            palmonFaster = true;
         }
-        return enemyfaster; // return whos faster
+        return palmonFaster; // return whos faster
     }
 
     public String getTypeOne()
@@ -52,5 +52,30 @@ public class Palmon // constructor
     public int getId()
     {
         return id;
+    }
+
+    public String[] getTypes()
+    {
+        return type;
+    }
+
+    public int getAttack()
+    {
+        return attack;
+    }
+
+    public int getDefense()
+    {
+        return defense;
+    }
+
+    public double getHp()
+    {
+        return hp;
+    }
+
+    public void adjustHp(double damage)
+    {
+        hp = hp - damage;
     }
 }

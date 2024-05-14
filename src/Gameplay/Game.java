@@ -1,4 +1,4 @@
-package Game;
+package Gameplay;
 
 import csv_handling.CSV_Reader;
 import csv_handling.CSV_Searching;
@@ -6,24 +6,38 @@ import data_structures.Printing;
 import elements.Palmon;
 import elements.Move;
 
-import java.util.*;
+import data_structures.Stack;
 
-public class Game
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Random;
+
+public class Game // extends Thread
 {
     Printing print;
     CSV_Reader data;
     CSV_Searching searching;
-    Game game;
+    Fight fight;
 
-    public Game(Printing print, CSV_Reader data, CSV_Searching selection)
+    public Game(CSV_Reader data, CSV_Searching selection, Printing print)
     {
         this.print = print;
         this.data = data;
         this.searching = selection;
     }
 
-    public void initialMenuPlayer(CSV_Searching searching)
+    // @Override
+    public void run()
     {
+        Game game = new Game(data, searching, print);
+        Fight fight = new Fight(game, data);
+        game.teamSettings(searching, fight);
+    }
+
+    public void teamSettings(CSV_Searching searching, Fight fight)
+    {
+        // Team Settings Palmons Player
         int playersize = 0;
         playersize = print.printsc("Amount of Palmons in your Team?", playersize);
 
@@ -46,12 +60,10 @@ public class Game
                 break;
         }
 
-        initialMenuEnemy(playersize);
-        HashMap<Integer, ArrayList<Move>> PlayersPalmonsWithMoves = setMovesForPalmon(data, playerPalmons);
-    }
+        // Setting Moves for Palmons
+        HashMap<Integer, ArrayList<Move>> playersPalMoves = setMovesForPalmon(data, playerPalmons);
 
-    public void initialMenuEnemy(int playersize)
-    {
+        // Team Settings Palmons Enemy
         int enemysize = 0;
         enemysize = print.printsc("Amount of Palmons in your Enemys Team? \\(0) randomly", enemysize);
 
@@ -59,11 +71,18 @@ public class Game
         {
             Random r = new Random();
             enemysize = r.nextInt(playersize * 2);
-            print.print(enemysize + " Palmons will be fighting in your enemys team!");
+            if(enemysize != 0)
+            {
+                print.print(enemysize + " Palmons will be fighting in your enemys team!");
+            }
         }
-
         Stack<Palmon> enemyPalmons = assembleRandomly(enemysize); // Always choosing the enemys Palmons by random
-        HashMap<Integer, ArrayList<Move>> EnemysPalmonsWithMoves = setMovesForPalmon(data, enemyPalmons);
+        // Setting Moves for Palmons
+        HashMap<Integer, ArrayList<Move>> enemiesPalMoves = setMovesForPalmon(data, enemyPalmons);
+
+        // Start the Fight
+        fight.FightOverview(playerPalmons, enemyPalmons, enemiesPalMoves);
+        // public void FightOverview(Stack<Palmon> playerTeam, Stack<Palmon> enemyTeam, HashMap<Integer, ArrayList<Move>> enemiesPalMoves)
     }
 
     public Stack<Palmon> assembleRandomly(int teamsize)
@@ -82,7 +101,7 @@ public class Game
             randomPalmon = palmon_db.get(randomIndex);
             if(randomPalmon != null)
             {
-                team.push(randomPalmon);
+                team.push(team, randomPalmon);
             }
         }
         return team;
@@ -100,7 +119,7 @@ public class Game
 
             if(palmon_db.containsKey(id))
             {
-                team.push(palmon_db.get(id));
+                team.push(team, palmon_db.get(id));
             }
             else
             {
@@ -122,26 +141,29 @@ public class Game
     {
         Stack<Palmon> team = new Stack<>();
 
-        for(int count = 0; count < teamsize; count++)
+        for(int i = 0; i < teamsize; i++)
         {
-            if(count == 0) // only relevant for first round to display the amount in print correctly
+            if(i == 0) // only relevant for first round to display the amount in print correctly
             {
-                count++;
+                i++;
             }
-
-            String type = "";
-            print.print("What type should the " + count + ". Palmon be? (please type in the name)");
 
             HashSet<String> types = searching.saveAllTypes(data);
             for(String alltypes: types)
             {
-                System.out.println(type);
+                if(!alltypes.equals("no type found."))
+                {
+                    System.out.println(alltypes);
+                }
             }
 
-            HashMap<String, Palmon> selected_type = searching.sortByFirstType(type, data);
-            Set<String> palmon_names = selected_type.keySet(); // Speichern aller Keys der HashMap, also die Namen aller Palmons
+            String type = "";
+            type = print.printssc("What type should the " + i + ". Palmon be? (please type in the name)", type);
 
-            count = 0; // counter auf 0 setzen
+            HashMap<String, Palmon> selected_type = searching.sortByFirstType(type, data);
+            HashSet<String> palmon_names = new HashSet<>(selected_type.keySet()); // Speichern aller Keys der HashMap, also die Namen aller Palmons
+
+            int count = 0; // counter auf 0 setzen
             for(String name: palmon_names)
             {
                 if(count < 15) // wenn 15 Namen ausgegeben wurden wird gestoppt, um den User nicht zu überfordern
@@ -157,7 +179,7 @@ public class Game
 
             String decision = "";
             decision = print.printssc("These are 15 Palmons of the desired type. Choose one (by entering its name).", decision);
-            team.push(selected_type.get(decision)); // putting the desired Palmon in the team Stack
+            team.push(team, selected_type.get(decision)); // putting the desired Palmon in the team Stack
         }
         return team;
     }
@@ -167,7 +189,14 @@ public class Game
         ArrayList<Move> palmon_moves = new ArrayList<Move>(); // ArrayList for saving all Moves for the different Palmons
         HashMap<Integer, ArrayList<Move>> palmonMovesDb = new HashMap<>(); // saving the Moves in an ArrayList and connecting that with the Palmons in this HashMap
 
-        for(Palmon palmon: palmons) // iterating through every Palmon
+        ArrayList<Palmon> tempPalmons = new ArrayList<>(); // temporary iterating through the Palmons with for each to compare
+        while(palmons.getStackSize() != 0)
+        {
+            Palmon palmon = palmons.pull(palmons);
+            tempPalmons.add(palmon);
+        }
+
+        for(Palmon palmon: tempPalmons) // iterating through every Palmon
         {
             palmon_moves = searching.assembleMovesOnlyForPalmon(palmon.getId(), data);
             palmonMovesDb.put(palmon.getId(), palmon_moves); // saving the current Palmon with its Moves in the HashMap

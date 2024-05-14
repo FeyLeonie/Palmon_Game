@@ -30,8 +30,15 @@ public class Stack<T>
         return _data;
     }
 
-    public boolean isEmpty()
+    public int getStackSize()
     {
-        return stackSize == 0;
+        return stackSize;
+    }
+
+    public T peek(Stack<T> _stack) {
+        if (_stack.top.data != null) {
+            return _stack.top.data;
+        }
+        return null;
     }
 }

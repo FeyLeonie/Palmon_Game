@@ -1,22 +1,17 @@
 package data_structures;
 
-public class Node<T> implements Cloneable
+class Node<T>
 {
-    T data;
-    Node<T> next; // pointer
-    Node<T> previous;
-    int index;
+        T data;
 
-    Node (T _data ) {
-        this.data = _data;
-    }
+        Node<T> next; //pointer
 
-    Node (Node<T> _toCopy ) {
-        this.data = _toCopy.data;
-        this.next = _toCopy.next;
-        this.previous = _toCopy.previous;
-    }
+        public Node(T _data) {
 
+            this.data = _data;
 
+            this.next = null;
+
+        }
 }
 

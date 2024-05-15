@@ -2,7 +2,7 @@ package Gameplay;
 
 import csv_handling.CSV_Reader;
 import data_structures.Printing;
-import data_structures.Stack;
+import data_structures.Queue;
 import elements.Effectivity;
 import elements.Move;
 import elements.Palmon;
@@ -16,8 +16,8 @@ public class Fight
     public Game game;
     public CSV_Reader data;
     public Printing print;
-    public Stack<Palmon> playerTeam;
-    public Stack<Palmon> enemyTeam;
+    public Queue<Palmon> playerTeam;
+    public Queue<Palmon> enemyTeam;
     public HashMap<Integer, ArrayList<Move>> playersPalMoves;
     public HashMap<Integer, ArrayList<Move>> enemiesPalMoves;
     public ArrayList<Effectivity> effectivity_db; // CSV_Reader
@@ -30,9 +30,10 @@ public class Fight
 
 
     int round = 0;
-    public void FightOverview(Stack<Palmon> playerTeam, Stack<Palmon> enemyTeam, HashMap<Integer, ArrayList<Move>> enemiesPalMoves)
+    public void FightOverview(Queue<Palmon> playerPalmons, Queue<Palmon> enemyPalmons, HashMap<Integer, ArrayList<Move>> enemiesPalMoves, HashMap<Integer, ArrayList<Move>> playersPalMoves)
     {
-        while(playerTeam.getStackSize() != 0 && enemyTeam.getStackSize() != 0)
+
+        while(playerPalmons.getQueueSize() != 0 && enemyPalmons.getQueueSize() != 0)
         {
             round++;
             print.print("The " +round+ " . round is about to start! Prepare yourself for a fair fight");
@@ -43,12 +44,12 @@ public class Fight
             loadNextPalmons(playerTeam, enemyTeam, playerPalmon, enemyPalmon, enemiesPalMoves);
         }
 
-        if(playerTeam.getStackSize() == 0)
+        if(playerTeam.getQueueSize() == 0)
         {
             playerLost();
         }
 
-        if(enemyTeam.getStackSize() == 0)
+        if(enemyTeam.getQueueSize() == 0)
         {
             playerWon();
         }
@@ -56,20 +57,20 @@ public class Fight
     }
 
     // Output: playerPalmon and enemyPalmon
-    public void loadNextPalmons(Stack<Palmon> playerTeam, Stack<Palmon> enemyTeam, Palmon playerPalmon, Palmon enemyPalmon, HashMap<Integer, ArrayList<Move>> enemiesPalMoves)
+    public void loadNextPalmons(Queue<Palmon> playerTeam, Queue<Palmon> enemyTeam, Palmon playerPalmon, Palmon enemyPalmon, HashMap<Integer, ArrayList<Move>> enemiesPalMoves)
     {
         Move playerAttack = null;
         Move enemyAttack = null;
 
         if(playerPalmon == null || playerPalmon.getHp() == 0) // if Palmon does not have a value yet or if Palmon got defeated choose the next one
         {
-            playerPalmon = playerTeam.pull(playerTeam); // Load next Palmon out of Stack
+            playerPalmon = playerTeam.dequeue(); // Load next Palmon out of Stack
             playerAttack = chooseMovePlayer(enemyPalmon, enemiesPalMoves); // Let Player choose the Move for the Palmon
         }
 
         if(enemyPalmon == null || enemyPalmon.getHp() == 0)
         {
-            enemyPalmon = enemyTeam.pull(enemyTeam); // Load next Palmon out of Stack
+            enemyPalmon = enemyTeam.dequeue(); // Load next Palmon out of Stack
             enemyAttack = chooseMoveEnemy(enemyPalmon, enemiesPalMoves); // Let the Player choose the Move for the Palmon
         }
 
@@ -187,7 +188,7 @@ public class Fight
         else
         {
             print.print("You defeated your enemies Palmon " +enemyPalmon.getName() + ". Your enemie cant attack this round.");
-            FightOverview(playerTeam, enemyTeam, enemiesPalMoves); // start of next Round
+            FightOverview(playerTeam, enemyTeam, enemiesPalMoves, playersPalMoves); // start of next Round
         }
 
         if(playerPalmon.getHp() > 0 && enemyPalmon.getHp() > 0) // if both Palmons are´nt defeated, round does not start new but new Moves will be chosen
@@ -234,7 +235,7 @@ public class Fight
         else
         {
             print.print("Your Palmon " + playerPalmon.getName() + " got defeated. No attack this round. :(");
-            FightOverview(playerTeam, enemyTeam, enemiesPalMoves); // start of next Round
+            FightOverview(playerTeam, enemyTeam, enemiesPalMoves, playersPalMoves); // start of next Round
         }
 
         if(playerPalmon.getHp() > 0 && enemyPalmon.getHp() > 0) // if both Palmons are´nt defeated, round does not start new but new Moves will be chosen
@@ -277,10 +278,10 @@ public class Fight
     public void playerWon()
     {
         print.print("You won! CONGRATULATIONS! Here are the names of your Palmons that supported you...");
-        while(playerTeam.getStackSize() != 0)
+        while(playerTeam.getQueueSize() != 0)
         {
-            System.out.println(playerTeam.peek(playerTeam).getName()); // printing out the Palmon
-            playerTeam.pull(playerTeam); // Pushing the Palmon out of the Stack
+            System.out.println(playerTeam.showTop().getName()); // printing out the Palmon
+            playerTeam.dequeue(); // Pushing the Palmon out of the Stack
         }
     }
 

@@ -14,9 +14,9 @@ import java.util.HashMap;
 public class CSV_Reader // extends Thread
 {
     // Paths
-    final String path_palmon = "C://Users//Fey//IdeaProjects//AA_Latest_Palmon//src//csv_dateien//palmon.csv"; // Path Palmon
-    final String path_move = "C://Users//Fey//IdeaProjects//AA_Latest_Palmon//src//csv_dateien//moves.csv";
-    String path_effectivity  = "C://Users//Fey//IdeaProjects//AA_Latest_Palmon//src//csv_dateien//effectivity.csv";
+    final String path_palmon = "/Users/i589533/IdeaProjects/Palmon_Game/src/csv_dateien/palmon.csv"; // Path Palmon
+    final String path_move = "/Users/i589533/IdeaProjects/Palmon_Game/src/csv_dateien/moves.csv";
+    String path_effectivity  = "/Users/i589533/IdeaProjects/Palmon_Game/src/csv_dateien/effectivity.csv";
     // final String path_palmonmove = "C://Users//Fey//IdeaProjects//AA_Latest_Palmon//src//csv_dateien//palmon_move.csv";
 
     // HashMaps
@@ -157,4 +157,6 @@ public class CSV_Reader // extends Thread
             System.out.println("Unexpected issue (while reading and saving the Effectivity). Please contact support (and run screaming in circles).");
         }
     }
+
+    //TODO DU HAST DIE PALMON MOVE DINGENS EINFACH GELÖSCHT...
 }

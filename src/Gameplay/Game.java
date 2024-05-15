@@ -6,7 +6,7 @@ import data_structures.Printing;
 import elements.Palmon;
 import elements.Move;
 
-import data_structures.Stack;
+import data_structures.Queue;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,6 +20,10 @@ public class Game // extends Thread
     CSV_Searching searching;
     Fight fight;
 
+
+    public Queue<Palmon> playerPalmons;
+    public Queue<Palmon> enemyPalmons;
+
     public Game(CSV_Reader data, CSV_Searching selection, Printing print)
     {
         this.print = print;
@@ -32,10 +36,10 @@ public class Game // extends Thread
     {
         Game game = new Game(data, searching, print);
         Fight fight = new Fight(game, data);
-        game.teamSettings(searching, fight);
+        game.teamSettings(searching, fight, playerPalmons, enemyPalmons);
     }
 
-    public void teamSettings(CSV_Searching searching, Fight fight)
+    public void teamSettings(CSV_Searching searching, Fight fight, Queue<Palmon> playerPalmons, Queue<Palmon> enemyPalmons)
     {
         // Team Settings Palmons Player
         int playersize = 0;
@@ -44,19 +48,19 @@ public class Game // extends Thread
         int selection = 0;
         selection = print.printsc("How do you want to assemble your team? \\(1) randomly \\(2) by id \\(3) by type", selection);
 
-        Stack<Palmon> playerPalmons = new Stack<>();
+        playerPalmons = new Queue<>();
         switch(selection)
         {
             case 1:
-                playerPalmons = assembleRandomly(playersize);
+                playerPalmons = assembleRandomly(playersize, playerPalmons);
                 break;
 
             case 2:
-                playerPalmons = assembleById(playersize);
+                playerPalmons = assembleById(playersize, playerPalmons);
                 break;
 
             case 3:
-                playerPalmons = assembleByFirstType(playersize, searching);
+                playerPalmons = assembleByFirstType(playersize, searching, playerPalmons);
                 break;
         }
 
@@ -76,16 +80,17 @@ public class Game // extends Thread
                 print.print(enemysize + " Palmons will be fighting in your enemys team!");
             }
         }
-        Stack<Palmon> enemyPalmons = assembleRandomly(enemysize); // Always choosing the enemys Palmons by random
+
+        enemyPalmons = new Queue<>();
+        enemyPalmons = assembleRandomly(enemysize, enemyPalmons); // Always choosing the enemys Palmons by random
         // Setting Moves for Palmons
         HashMap<Integer, ArrayList<Move>> enemiesPalMoves = setMovesForPalmon(data, enemyPalmons);
 
         // Start the Fight
-        fight.FightOverview(playerPalmons, enemyPalmons, enemiesPalMoves);
-        // public void FightOverview(Stack<Palmon> playerTeam, Stack<Palmon> enemyTeam, HashMap<Integer, ArrayList<Move>> enemiesPalMoves)
+        fight.FightOverview(playerPalmons, enemyPalmons, enemiesPalMoves, playersPalMoves);
     }
 
-    public Stack<Palmon> assembleRandomly(int teamsize)
+    public Queue<Palmon> assembleRandomly(int teamsize, Queue<Palmon> team)
     {
         HashMap<Integer, Palmon> palmon_db = data.palmon_db;
 
@@ -93,24 +98,25 @@ public class Game // extends Thread
         int randomIndex;
         Palmon randomPalmon = null;
 
-        Stack<Palmon> team = new Stack<>();
-
         for(int i = 0; i < teamsize; i++)
         {
             randomIndex = r.nextInt(palmon_db.size());
             randomPalmon = palmon_db.get(randomIndex);
             if(randomPalmon != null)
             {
-                team.push(team, randomPalmon);
+                team.enqueue(randomPalmon);
+            }
+            else
+            {
+                i--;
             }
         }
         return team;
     }
 
-    public Stack<Palmon> assembleById(int teamsize)
+    public Queue<Palmon> assembleById(int teamsize, Queue<Palmon> team)
     {
         HashMap<Integer, Palmon> palmon_db = data.palmon_db;
-        Stack<Palmon> team = new Stack<>();
         int id = 0;
 
         for(int i = 0; i < teamsize; i++)
@@ -119,7 +125,7 @@ public class Game // extends Thread
 
             if(palmon_db.containsKey(id))
             {
-                team.push(team, palmon_db.get(id));
+                team.enqueue(palmon_db.get(id));
             }
             else
             {
@@ -137,17 +143,10 @@ public class Game // extends Thread
         return team;
     }
 
-    public Stack<Palmon> assembleByFirstType(int teamsize, CSV_Searching searching)
+    public Queue<Palmon> assembleByFirstType(int teamsize, CSV_Searching searching, Queue<Palmon> team)
     {
-        Stack<Palmon> team = new Stack<>();
-
-        for(int i = 0; i < teamsize; i++)
+        for(int i = 1; i <= teamsize; i++)
         {
-            if(i == 0) // only relevant for first round to display the amount in print correctly
-            {
-                i++;
-            }
-
             HashSet<String> types = searching.saveAllTypes(data);
             for(String alltypes: types)
             {
@@ -166,7 +165,7 @@ public class Game // extends Thread
             int count = 0; // counter auf 0 setzen
             for(String name: palmon_names)
             {
-                if(count < 15) // wenn 15 Namen ausgegeben wurden wird gestoppt, um den User nicht zu überfordern
+                if(count <= 15) // wenn 15 Namen ausgegeben wurden wird gestoppt, um den User nicht zu überfordern
                 {
                     print.print(name);
                     count++;
@@ -179,27 +178,22 @@ public class Game // extends Thread
 
             String decision = "";
             decision = print.printssc("These are 15 Palmons of the desired type. Choose one (by entering its name).", decision);
-            team.push(team, selected_type.get(decision)); // putting the desired Palmon in the team Stack
+            team.enqueue(selected_type.get(decision)); // putting the desired Palmon in the team Queue
         }
         return team;
     }
 
-    public HashMap<Integer, ArrayList<Move>> setMovesForPalmon(CSV_Reader data, Stack<Palmon> palmons)
+    public HashMap<Integer, ArrayList<Move>> setMovesForPalmon(CSV_Reader data, Queue<Palmon> palmons)
     {
-        ArrayList<Move> palmon_moves = new ArrayList<Move>(); // ArrayList for saving all Moves for the different Palmons
+        ArrayList<Move> palmon_moves; // ArrayList for saving all Moves for the different Palmons
         HashMap<Integer, ArrayList<Move>> palmonMovesDb = new HashMap<>(); // saving the Moves in an ArrayList and connecting that with the Palmons in this HashMap
 
-        ArrayList<Palmon> tempPalmons = new ArrayList<>(); // temporary iterating through the Palmons with for each to compare
-        while(palmons.getStackSize() != 0)
-        {
-            Palmon palmon = palmons.pull(palmons);
-            tempPalmons.add(palmon);
-        }
+        ArrayList<Palmon> tempPalmons = palmons.toArrayList(); // saving the queue Palmons into an ArrayList to work with them
 
         for(Palmon palmon: tempPalmons) // iterating through every Palmon
         {
-            palmon_moves = searching.assembleMovesOnlyForPalmon(palmon.getId(), data);
-            palmonMovesDb.put(palmon.getId(), palmon_moves); // saving the current Palmon with its Moves in the HashMap
+            palmon_moves = searching.assembleMovesOnlyForPalmon(palmon.getId(), data); // finding the Moves for the current Palmon and saving them in an ArrayList
+            palmonMovesDb.put(palmon.getId(), palmon_moves); // saving the current Palmon with its Moves (saved in the ArrayList) in the HashMap
         }
         return palmonMovesDb;
     }

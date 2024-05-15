@@ -184,12 +184,13 @@ public class CSV_Searching extends Thread
 
     public ArrayList<Move> assembleMovesOnlyForPalmon(int id, CSV_Reader data)
     {
+        //TODO this is not working
         ArrayList<Move> palmon_move = new ArrayList<>();
 
         ConPalmonMove conPalmonMove;
         Move move;
 
-        HashMap<Integer, ConPalmonMove> palsmoves = data.palsMoves;
+        HashMap<Integer, ConPalmonMove> palsmoves = data.movesForPals; // connection betweeen Palmon and Move
 
         for (Integer key : palsmoves.keySet()) // iterates through each element of the hashmap
         {

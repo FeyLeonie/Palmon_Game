@@ -14,8 +14,7 @@ import java.util.Random;
 public class Fight extends Printing
 {
     public Game game;
-    public CSV_Reader data;
-    public ArrayList<Effectivity> effectivity_db; // CSV_Reader
+    public CSV_Reader data; // CSV_Reader
 
     // saving the Index of the Move in the ArrayList to update Max Usages
     int playerMoveIndex = 0;
@@ -31,59 +30,72 @@ public class Fight extends Printing
     int round = 0;
     public void FightOverview(Queue<Palmon> playerPalmons, Queue<Palmon> enemyPalmons, HashMap<Integer, ArrayList<Move>> enemiesPalMoves, HashMap<Integer, ArrayList<Move>> playersPalMoves)
     {
-        Printing print = new Printing();
 
         Palmon playerPalmon = playerPalmons.dequeue(); // load first Palmon into the Fight
         Palmon enemyPalmon = enemyPalmons.dequeue(); // load first Palmon into the Fight
 
+        //TODO Endlosschleife!!
         while(playerPalmons.getQueueSize() != 0 && enemyPalmons.getQueueSize() != 0)
         {
             round++;
-            print.print("The " +round+ ". round is about to start!");
+            print("The " +round+ ". round is about to start!");
 
             Move enemyMove = chooseMoveEnemy(enemyPalmon, enemiesPalMoves);
             Move playerMove = chooseMovePlayer(playerPalmon, playersPalMoves);
 
-            while(playerPalmon.getHp() > 0 || enemyPalmon.getHp() > 0)
+            while(playerPalmon.getHp() > 0 && enemyPalmon.getHp() > 0)
             {
                 if(playerPalmon.speed() >= enemyPalmon.speed())
                 {
                     //Player starts attacking
-                    print.print("Your Palmon " +playerPalmon.getName()+ " is about to attack! Ready to rumble?");
-                    attackingSequence(playerPalmon, playerMove, enemyPalmon, playersPalMoves, playerMoveIndex);
+                    print("Your Palmon " +playerPalmon.getName()+ " is about to attack! Ready to rumble?");
+                    enemyPalmon = attackingSequence(playerPalmon, playerMove, enemyPalmon, playersPalMoves, playerMoveIndex);
+
+                    if(enemyPalmon.getHp() > 0)
+                    {
+                        // Enemy starts attacking
+                        print("The enemies Palmon " +enemyPalmon.getName()+ " is about to attack!");
+                        playerPalmon = attackingSequence(enemyPalmon, enemyMove, playerPalmon, enemiesPalMoves, enemyMoveIndex);
+                    }
                 }
                 else
                 {
                     // Enemy starts attacking
-                    print.print("The enemies Palmon " +enemyPalmon.getName()+ " is about to attack!");
-                    attackingSequence(enemyPalmon, enemyMove, playerPalmon, enemiesPalMoves, enemyMoveIndex);
+                    print("The enemies Palmon " +enemyPalmon.getName()+ " is about to attack!");
+                    playerPalmon = attackingSequence(enemyPalmon, enemyMove, playerPalmon, enemiesPalMoves, enemyMoveIndex);
+
+                    if(playerPalmon.getHp() > 0)
+                    {
+                        //Player starts attacking
+                        print("Your Palmon " +playerPalmon.getName()+ " is about to attack! Ready to rumble?");
+                        enemyPalmon = attackingSequence(playerPalmon, playerMove, enemyPalmon, playersPalMoves, playerMoveIndex);
+                    }
                 }
             }
 
             if(playerPalmon.getHp() <= 0) // if Palmon is defeated
             {
+                if(playerPalmons.getQueueSize() == 0)
+                {
+                    playerLost();
+                    break;
+                }
                 playerPalmon = playerPalmons.dequeue(); // load next Palmon into fight
             }
 
             if(enemyPalmon.getHp() <= 0) // if Palmon is defeated
             {
+                if(enemyPalmons.getQueueSize() == 0)
+                {
+                    playerWon(playerPalmons);
+                    break;
+                }
                 enemyPalmon = enemyPalmons.dequeue(); // load next Palmon into fight
             }
         }
-
-        if(playerPalmons.getQueueSize() == 0)
-        {
-            playerLost();
-        }
-
-        if(enemyPalmons.getQueueSize() == 0)
-        {
-            playerWon(playerPalmons);
-        }
-
     }
 
-    public void attackingSequence(Palmon attacker, Move attack, Palmon defender, HashMap<Integer, ArrayList<Move>> MoveHashMap, int index)
+    public Palmon attackingSequence(Palmon attacker, Move attack, Palmon defender, HashMap<Integer, ArrayList<Move>> moveHashMap, int index)
     {
         // values are temporary
         double damageFactor = 0; // effectivity factor
@@ -95,20 +107,28 @@ public class Fight extends Printing
 
         if(hits)
         {
-            damageFactor = getEffectivity(attacker, defender, effectivity_db); // damage factor is calculated
-            damage = (attacker.getAttack() + attack.getDamage() - defender.getDefense()) * (damageFactor/100); // attacking damage is calculated
+            damageFactor = getEffectivity(attacker, defender); // damage factor is calculated
+            damage = (attacker.getAttack() + attack.getDamage() - defender.getDefense()) * damageFactor; // attacking damage is calculated
 
-            defender.adjustHp(damage); // adjusting the defenders HP
+            if(damage > 0) // damage zero or below zero e.g. if Players defense is higher than the actual attack
+            {
+                defender.adjustHp(damage); // adjusting the defenders HP
 
-            attack.useMove(); // increase the Move max usages by one
-            print("The hit was successful!" +attacker.getName()+ " made " +damage+ " hp damage to " +defender.getName());
+                print("The hit was successful! " +attacker.getName()+ " made " +damage+ " hp damage to " +defender.getName());
+            }
         }
         else
         {
             print(attacker.getName()+ " didnt hit. Maybe next time");
         }
 
-        MoveHashMap.get(attacker.getId()).get(index).useMove();
+        //TODO ist das hier richtig?
+        // Updating the usage of the Move by one
+        ArrayList<Move> moves = moveHashMap.get(attacker.getId());
+        Move move = moves.get(index);
+        move.useMove();
+
+        return defender;
     }
 
     //  Output: enemyAttack (Enemies Move)
@@ -152,10 +172,11 @@ public class Fight extends Printing
             tempMove = playersMove;
             if (tempMove != null)
             {
-                if (tempMove.getDamage() != 0)
-                {
                     print.print("Move " + tempMove.getName() + " with possible damage: " + tempMove.getDamage());
-                }
+            }
+            else
+            {
+                print("null");
             }
         }
 
@@ -191,11 +212,17 @@ public class Fight extends Printing
         return playerAttack;
     }
 
-    public double getEffectivity(Palmon attacker, Palmon defender, ArrayList<Effectivity> effectivity_db)
+    public double getEffectivity(Palmon attacker, Palmon defender)
     {
+        // Grundgedanke mal auf Deutsch:
+        // Ich nehme die geringste Effektivität (es gibt bei Palmons mit mehreren Types ja mehrere zur Auswahl)
+
+        ArrayList<Effectivity> effectivity_db = CSV_Reader.effectivity_db;
+
         String [] attackerTypes = attacker.getTypes();
         String [] targetTypes = defender.getTypes();
-        double damageFactor = 0;
+        double damageFactor;
+        double oldDamageFactor = -1;
 
         for(Effectivity effectivity: effectivity_db)
         {
@@ -204,9 +231,21 @@ public class Fight extends Printing
                     && (targetTypes[0].equals(effectivity.getTargetType()) || targetTypes[1].equals(effectivity.getTargetType())))
             {
                 damageFactor = effectivity.getDamageFactor();
+
+                if(oldDamageFactor == -1) // in first round tempDamageFactor needs to overwritten as well
+                {
+                    oldDamageFactor = effectivity.getDamageFactor();
+                }
+
+                if(damageFactor <= oldDamageFactor) // if the new Effectivity is smaller than the old Effectivity
+                {
+                    oldDamageFactor = effectivity.getDamageFactor(); // overwrite the old Effectivity
+                }
+
             }
         }
-        return damageFactor;
+
+        return oldDamageFactor; // return smallest Effectivity
     }
 
     public boolean setAccuracy(Move move)

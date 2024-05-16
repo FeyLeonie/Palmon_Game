@@ -172,15 +172,15 @@ public class CSV_Searching extends Thread
         // Retrieve the list of ConPalmonMove objects associated with the Palmon ID
         List<Move> palmonMoves = palsMoves.get(id);
 
-        if (palmonMoves != null)
-        {
             // Iterate over each ConPalmonMove object for the Palmon ID
             for (Move palMove : palmonMoves)
             {
-                // Add the Move object to the ArrayList
-                palmon_move.add(palMove);
+                if(palMove != null)
+                {
+                    // Add the Move object to the ArrayList
+                    palmon_move.add(palMove);
+                }
             }
-        }
         return palmon_move; // every possible Move for the Palmon
     }
 }

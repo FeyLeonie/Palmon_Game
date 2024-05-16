@@ -43,7 +43,7 @@ public class Move
 
     public void useMove()
     {
-        this.usages-=1;
+        this.usages+=1;
     }
 
     public int usagesLeft()

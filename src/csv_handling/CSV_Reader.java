@@ -29,7 +29,7 @@ public class CSV_Reader // extends Thread
     public MultiHashMap<Move, Integer> movesForPals = new MultiHashMap<>(); // All Moves listed with further information out of CSV PalmonMove, Key: Move ID
 
     // ArrayLists
-    ArrayList<Effectivity> effectivity_db  = new ArrayList <>(); // Storage medium for Effectivity
+    public static ArrayList<Effectivity> effectivity_db  = new ArrayList <>(); // Storage medium for Effectivity
 
     // @Override
     public void run()

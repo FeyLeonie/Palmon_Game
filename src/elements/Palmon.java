@@ -62,13 +62,13 @@ public class Palmon // constructor
         return defense;
     }
 
-    public double getHp()
-    {
-        return hp;
-    }
-
     public void adjustHp(double damage)
     {
         hp = hp - damage;
+    }
+
+    public double getHp()
+    {
+        return hp;
     }
 }

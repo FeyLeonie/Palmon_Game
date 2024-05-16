@@ -1,5 +1,6 @@
 package csv_handling;
 
+import data_structures.MultiHashMap;
 import elements.ConPalmonMove;
 import elements.Move;
 import elements.Palmon;
@@ -7,6 +8,7 @@ import elements.Palmon;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet; // for saving all types since HashSet does not save duplicates
+import java.util.List;
 
 public class CSV_Searching extends Thread
 {
@@ -161,48 +163,24 @@ public class CSV_Searching extends Thread
         }
     }
 
-    public ArrayList<ConPalmonMove> assembleMovesWithLevelForPalmon(int id, CSV_Reader data)
-    {
-        ArrayList<ConPalmonMove> palmon_move = new ArrayList<>();
-
-        HashMap<Integer, ConPalmonMove> palsmoves = data.palsMoves;
-
-        ConPalmonMove conPalmonMove;
-
-        for (Integer key : palsmoves.keySet()) // iterates through each element of the hashmap
-        {
-            // ConPalmonMove value = palsmoves.get(key);
-            if(key.equals(id))
-            {
-                conPalmonMove = palsmoves.get(key);
-                palmon_move.add(conPalmonMove);
-
-            }
-        }
-        return palmon_move;
-    }
-
     public ArrayList<Move> assembleMovesOnlyForPalmon(int id, CSV_Reader data)
     {
-        //TODO this is not working
-        ArrayList<Move> palmon_move = new ArrayList<>();
+        //TODO Working?
+        ArrayList<Move> palmon_move = new ArrayList<>(); // the possible Moves for the Palmon will be saved in here
+        MultiHashMap<Integer, Move> palsMoves = data.palsMoves; // "importing" the MultiHashMap with all the Palmon IDs and the possible Moves
 
-        ConPalmonMove conPalmonMove;
-        Move move;
+        // Retrieve the list of ConPalmonMove objects associated with the Palmon ID
+        List<Move> palmonMoves = palsMoves.get(id);
 
-        HashMap<Integer, ConPalmonMove> palsmoves = data.movesForPals; // connection betweeen Palmon and Move
-
-        for (Integer key : palsmoves.keySet()) // iterates through each element of the hashmap
+        if (palmonMoves != null)
         {
-            // ConPalmonMove value = palsmoves.get(key);
-            if(key.equals(id))
+            // Iterate over each ConPalmonMove object for the Palmon ID
+            for (Move palMove : palmonMoves)
             {
-                conPalmonMove = palsmoves.get(key);
-                move = conPalmonMove.getMove();
-                palmon_move.add(move);
-
+                // Add the Move object to the ArrayList
+                palmon_move.add(palMove);
             }
         }
-        return palmon_move;
+        return palmon_move; // every possible Move for the Palmon
     }
 }

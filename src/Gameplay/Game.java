@@ -42,32 +42,39 @@ public class Game // extends Thread
     public void teamSettings(CSV_Searching searching, Fight fight, Queue<Palmon> playerPalmons, Queue<Palmon> enemyPalmons)
     {
         // Team Settings Palmons Player
+
+        // asking for Players Teamsize
         int playersize = 0;
         playersize = print.printsc("Amount of Palmons in your Team?", playersize);
 
+        // asking for Team assembling method
         int selection = 0;
         selection = print.printsc("How do you want to assemble your team? \\(1) randomly \\(2) by id \\(3) by type", selection);
 
+        // assembling the Palmons for the Player (regarding the choice the Player made)
         playerPalmons = new Queue<>();
         switch(selection)
         {
-            case 1:
+            case 1: // assembling randomly
                 playerPalmons = assembleRandomly(playersize, playerPalmons);
                 break;
 
-            case 2:
+            case 2: // assembling by ID
                 playerPalmons = assembleById(playersize, playerPalmons);
                 break;
 
-            case 3:
+            case 3: // assembling by type
                 playerPalmons = assembleByFirstType(playersize, searching, playerPalmons);
                 break;
         }
 
-        // Setting Moves for Palmons
+        // Setting Moves for Players Palmons
         HashMap<Integer, ArrayList<Move>> playersPalMoves = setMovesForPalmon(data, playerPalmons);
 
+
+
         // Team Settings Palmons Enemy
+
         int enemysize = 0;
         enemysize = print.printsc("Amount of Palmons in your Enemys Team? \\(0) randomly", enemysize);
 
@@ -81,9 +88,11 @@ public class Game // extends Thread
             }
         }
 
+        // assembling the Palmons for the Enemy (always Random)
         enemyPalmons = new Queue<>();
         enemyPalmons = assembleRandomly(enemysize, enemyPalmons); // Always choosing the enemys Palmons by random
-        // Setting Moves for Palmons
+
+        // Setting Moves for Enemies Palmons
         HashMap<Integer, ArrayList<Move>> enemiesPalMoves = setMovesForPalmon(data, enemyPalmons);
 
         // Start the Fight

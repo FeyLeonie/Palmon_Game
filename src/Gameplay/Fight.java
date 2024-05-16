@@ -16,11 +16,11 @@ public class Fight
     public Game game;
     public CSV_Reader data;
     public Printing print;
-    public Queue<Palmon> playerTeam;
-    public Queue<Palmon> enemyTeam;
-    public HashMap<Integer, ArrayList<Move>> playersPalMoves;
-    public HashMap<Integer, ArrayList<Move>> enemiesPalMoves;
     public ArrayList<Effectivity> effectivity_db; // CSV_Reader
+
+    // saving the Index of the Move in the ArrayList to update Max Usages
+    int playerMoveIndex = 0;
+    int enemyMoveIndex = 0;
 
     public Fight(Game game, CSV_Reader data)
     {
@@ -32,49 +32,84 @@ public class Fight
     int round = 0;
     public void FightOverview(Queue<Palmon> playerPalmons, Queue<Palmon> enemyPalmons, HashMap<Integer, ArrayList<Move>> enemiesPalMoves, HashMap<Integer, ArrayList<Move>> playersPalMoves)
     {
+        Printing print = new Printing();
+
+        Palmon playerPalmon = playerPalmons.dequeue(); // load first Palmon into the Fight
+        Palmon enemyPalmon = enemyPalmons.dequeue(); // load first Palmon into the Fight
 
         while(playerPalmons.getQueueSize() != 0 && enemyPalmons.getQueueSize() != 0)
         {
             round++;
-            print.print("The " +round+ " . round is about to start! Prepare yourself for a fair fight");
+            print.print("The " +round+ ". round is about to start!");
 
-            Palmon playerPalmon = null;
-            Palmon enemyPalmon = null;
+            Move enemyMove = chooseMoveEnemy(enemyPalmon, enemiesPalMoves);
+            Move playerMove = chooseMovePlayer(playerPalmon, playersPalMoves);
 
-            loadNextPalmons(playerTeam, enemyTeam, playerPalmon, enemyPalmon, enemiesPalMoves);
+            while(playerPalmon.getHp() > 0 || enemyPalmon.getHp() > 0)
+            {
+                if(playerPalmon.speed() >= enemyPalmon.speed())
+                {
+                    //Player starts attacking
+                    print.print("Your Palmon " +playerPalmon.getName()+ " is about to attack! Ready to rumble?");
+                    attackingSequence(playerPalmon, playerMove, enemyPalmon, playersPalMoves, playerMoveIndex);
+                }
+                else
+                {
+                    // Enemy starts attacking
+                    print.print("The enemies Palmon " +enemyPalmon.getName()+ " is about to attack!");
+                    attackingSequence(enemyPalmon, enemyMove, playerPalmon, enemiesPalMoves, enemyMoveIndex);
+                }
+            }
+
+            if(playerPalmon.getHp() <= 0) // if Palmon is defeated
+            {
+                playerPalmon = playerPalmons.dequeue(); // load next Palmon into fight
+            }
+
+            if(enemyPalmon.getHp() <= 0) // if Palmon is defeated
+            {
+                enemyPalmon = enemyPalmons.dequeue(); // load next Palmon into fight
+            }
         }
 
-        if(playerTeam.getQueueSize() == 0)
+        if(playerPalmons.getQueueSize() == 0)
         {
             playerLost();
         }
 
-        if(enemyTeam.getQueueSize() == 0)
+        if(enemyPalmons.getQueueSize() == 0)
         {
-            playerWon();
+            playerWon(playerPalmons);
         }
 
     }
 
-    // Output: playerPalmon and enemyPalmon
-    public void loadNextPalmons(Queue<Palmon> playerTeam, Queue<Palmon> enemyTeam, Palmon playerPalmon, Palmon enemyPalmon, HashMap<Integer, ArrayList<Move>> enemiesPalMoves)
+    public void attackingSequence(Palmon attacker, Move attack, Palmon defender, HashMap<Integer, ArrayList<Move>> MoveHashMap, int index)
     {
-        Move playerAttack = null;
-        Move enemyAttack = null;
+        // values are temporary
+        double damageFactor = 0; // effectivity factor
+        boolean hits = false;
+        double damage = 0;
 
-        if(playerPalmon == null || playerPalmon.getHp() == 0) // if Palmon does not have a value yet or if Palmon got defeated choose the next one
+        // Player starts
+        hits = setAccuracy(attack);
+
+        if(hits)
         {
-            playerPalmon = playerTeam.dequeue(); // Load next Palmon out of Stack
-            playerAttack = chooseMovePlayer(enemyPalmon, enemiesPalMoves); // Let Player choose the Move for the Palmon
+            damageFactor = getEffectivity(attacker, defender, effectivity_db); // damage factor is calculated
+            damage = (attacker.getAttack() + attack.getDamage() - defender.getDefense()) * (damageFactor/100); // attacking damage is calculated
+
+            defender.adjustHp(damage); // adjusting the defenders HP
+
+            attack.useMove(); // increase the Move max usages by one
+            print.print("The hit was successful!" +attacker.getName()+ " made " +damage+ " hp damage to " +defender.getName());
+        }
+        else
+        {
+            print.print(attacker.getName()+ " didnt hit. Maybe next time");
         }
 
-        if(enemyPalmon == null || enemyPalmon.getHp() == 0)
-        {
-            enemyPalmon = enemyTeam.dequeue(); // Load next Palmon out of Stack
-            enemyAttack = chooseMoveEnemy(enemyPalmon, enemiesPalMoves); // Let the Player choose the Move for the Palmon
-        }
-
-        attackingMode(playerPalmon, playerAttack, enemyPalmon, enemyAttack);
+        MoveHashMap.get(attacker.getId()).get(index).useMove();
     }
 
     //  Output: enemyAttack (Enemies Move)
@@ -88,7 +123,7 @@ public class Fight
 
         Move enemyAttack = enemiesMoves.get(randomMove); // Saving the current Move
 
-        while(enemyAttack.usagesLeft() <= 0) // if selected Move is already on Max Usages this will be needed
+        while(enemyAttack.usagesLeft() <= 0 || enemyAttack == null) // if selected Move is already on Max Usages this will be needed
         {
             r = new Random();
             randomMove = r.nextInt(enemiesMoves.size());
@@ -96,30 +131,50 @@ public class Fight
             enemyAttack = enemiesMoves.get(randomMove); // Saving the current Move
         }
 
+        enemyMoveIndex = randomMove; // Saving the Index of the Move in the ArrayList
         return enemyAttack;
     }
 
     // Output: playerAttack (Players Move)
-    public Move chooseMovePlayer(Palmon playerPalmon, HashMap<Integer, ArrayList<Move>> playerPalMoves)
+    public Move chooseMovePlayer(Palmon playerPalmon, HashMap<Integer, ArrayList<Move>> playersPalMoves)
     {
-        // Let the Player choose the preferred Move
-        ArrayList<Move> playersMoves = playersPalMoves.get(playerPalmon.getId()); // saving the ArrayList with all the Moves of the current Palmon
+        Printing print = new Printing();
 
-        for(Move move: playersMoves) // Printing out every Move the Player can choose from with its damage
+        // Let the Player choose the preferred Move
+
+        // saving the ArrayList with all the Moves of the current Palmon
+        ArrayList<Move> playersMoves;
+        playersMoves = playersPalMoves.get(playerPalmon.getId());
+
+        Move tempMove;
+        // Printing out every Move the Player can choose from with its damage
+        for(int i = 0; i < playersMoves.size(); i++)
         {
-            print.print("Move " +move.getName()+ " with possible damage: " +move.getDamage());
+            tempMove = playersMoves.get(i);
+
+            if(tempMove !=null)
+            {
+                print.print("Move " + tempMove.getName()+ " with possible damage: " + tempMove.getDamage());
+            }
+            else
+            {
+                print.print("Move ist null...");
+            }
         }
 
         String choice = "";
         print.printssc("These are the Moves you can choose one. Please type in the name of your preferred Move", choice); // letting the Player choose a Move
 
-        Move playerAttack = null; // initialising the Move already
-        for(Move move: playersMoves) // finding the correct Move
+        Move playerAttack = null;
+
+        // Finding the correct Move based on the player's choice
+        for (int i = 0; i < playersMoves.size(); i++)
         {
-            if(move.getName().equals(choice))
+            if (playersMoves.get(i).getName().equals(choice))
             {
-                playerAttack = move; // Saving the Move
-                // TODO try catch, wenn was falsches eingegeben wurde
+                playerAttack = playersMoves.get(i); // save the selected Move
+                playerMoveIndex = i; // Save the index of the selected Move
+                break; // Exit the loop once the Move is found
             }
         }
 
@@ -128,120 +183,11 @@ public class Fight
            print.print("This Move is not usable anymore. You used it too often. Please choose a different Move");
            chooseMovePlayer(playerPalmon, playersPalMoves);
         }
+
+        // saving the Index of the Move to update the Max Usages when using the Move
+
+
         return playerAttack;
-    }
-
-    public void attackingMode(Palmon playerPalmon, Move playerAttack, Palmon enemyPalmon, Move enemyAttack)
-    {
-        // First Attack
-        if(playerPalmon.speedTest(enemyPalmon)) // if playerPalmon is faster than enemyPalmon, Player starts with attack
-        {
-            // Player starts
-            playerAttacksFirst(playerPalmon, playerAttack, enemyPalmon, enemyAttack);
-        }
-        else
-        {
-            // Enemy starts
-            enemyAttacksFirst(playerPalmon, enemyPalmon, enemyAttack, playerAttack);
-        }
-    }
-
-    public void playerAttacksFirst(Palmon playerPalmon, Move playerAttack, Palmon enemyPalmon, Move enemyAttack)
-    {
-        double damageFactor = 0; // effectivity factor
-        boolean hits = false;
-        double damage = 0;
-
-        // Player starts
-        hits = setAccuracy(playerAttack);
-
-        if(hits)
-        {
-            damageFactor = getEffectivity(playerPalmon, enemyPalmon, effectivity_db);
-            damage = (playerPalmon.getAttack() + playerAttack.getDamage() - enemyPalmon.getDefense()) * (damageFactor/100);
-            enemyPalmon.adjustHp(damage);
-            playerAttack.useMove(); // increase max usages by one
-            print.print("Your hit was successful! You made " +damage+ " hp damage.");
-        }
-        else
-        {
-            print.print("You didnt hit :( Maybe next time");
-        }
-
-        //Enemy attacks
-        if(enemyPalmon.getHp() > 0) // if Palmon is still able to fight
-        {
-            hits = setAccuracy(enemyAttack);
-            if(hits)
-            {
-                damageFactor = getEffectivity(enemyPalmon, playerPalmon, effectivity_db); // get Effectivity factor
-                damage = (enemyPalmon.getAttack() + enemyAttack.getDamage() - playerPalmon.getDefense()) * (damageFactor/100); // calculate damage
-                playerPalmon.adjustHp(damage); // adjust hp
-                enemyAttack.useMove(); // increase max usages by one
-                print.print("You got hit! Enemy made " +damage+ " hp damage.");
-            }
-            else
-            {
-                print.print("The Enemies Palmon didnt hit. Lucky!");
-            }
-        }
-        else
-        {
-            print.print("You defeated your enemies Palmon " +enemyPalmon.getName() + ". Your enemie cant attack this round.");
-            FightOverview(playerTeam, enemyTeam, enemiesPalMoves, playersPalMoves); // start of next Round
-        }
-
-        if(playerPalmon.getHp() > 0 && enemyPalmon.getHp() > 0) // if both Palmons are´nt defeated, round does not start new but new Moves will be chosen
-        {
-            loadNextPalmons(playerTeam, enemyTeam, playerPalmon, enemyPalmon, enemiesPalMoves);
-        }
-    }
-
-    public void enemyAttacksFirst(Palmon playerPalmon, Palmon enemyPalmon, Move enemyAttack, Move playerAttack)
-    {
-        double damageFactor = 0; // effectivity factor
-        boolean hits = false;
-        double damage = 0;
-
-        hits = setAccuracy(enemyAttack);
-        if(hits)
-        {
-            damageFactor = getEffectivity(enemyPalmon, playerPalmon, effectivity_db); // get Effectivity factor
-            damage = (enemyPalmon.getAttack() + enemyAttack.getDamage() - playerPalmon.getDefense()) * (damageFactor/100); // calculate damage
-            playerPalmon.adjustHp(damage); // adjust hp
-            print.print("You got hit! Enemy made " +damage+ " hp damage.");
-        }
-        else
-        {
-            print.print("The Enemies Palmon didnt hit. Lucky!");
-        }
-
-        // Player starts
-        if(playerPalmon.getHp() > 0)
-        {
-            hits = setAccuracy(playerAttack);
-            if(hits)
-            {
-                damageFactor = getEffectivity(playerPalmon, enemyPalmon, effectivity_db);
-                damage = (playerPalmon.getAttack() + playerAttack.getDamage() - enemyPalmon.getDefense()) * (damageFactor/100);
-                enemyPalmon.adjustHp(damage);
-                print.print("Your hit was successful! You made " +damage+ " hp damage.");
-            }
-            else
-            {
-                print.print("You didnt hit :( Maybe next time");
-            }
-        }
-        else
-        {
-            print.print("Your Palmon " + playerPalmon.getName() + " got defeated. No attack this round. :(");
-            FightOverview(playerTeam, enemyTeam, enemiesPalMoves, playersPalMoves); // start of next Round
-        }
-
-        if(playerPalmon.getHp() > 0 && enemyPalmon.getHp() > 0) // if both Palmons are´nt defeated, round does not start new but new Moves will be chosen
-        {
-            loadNextPalmons(playerTeam, enemyTeam, playerPalmon, enemyPalmon, enemiesPalMoves);
-        }
     }
 
     public double getEffectivity(Palmon attacker, Palmon defender, ArrayList<Effectivity> effectivity_db)
@@ -275,18 +221,18 @@ public class Fight
         return hits;
     }
 
-    public void playerWon()
+    public void playerWon(Queue<Palmon> playerPalmons)
     {
         print.print("You won! CONGRATULATIONS! Here are the names of your Palmons that supported you...");
-        while(playerTeam.getQueueSize() != 0)
+        while(playerPalmons.getQueueSize() != 0)
         {
-            System.out.println(playerTeam.showTop().getName()); // printing out the Palmon
-            playerTeam.dequeue(); // Pushing the Palmon out of the Stack
+            System.out.println(playerPalmons.showTop().getName()); // printing out the Palmon
+            playerPalmons.dequeue(); // Pushing the Palmon out of the Stack
         }
     }
 
     public void playerLost()
     {
-        print.print("You sadly lost, sorry for that :( I´m sure you´ll win next round, try again!");
+        print.print("You sadly lost, sorry for that :( But dont be sad, I´m sure you´ll win next round, try again!");
     }
 }

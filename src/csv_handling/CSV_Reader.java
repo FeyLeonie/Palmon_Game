@@ -1,5 +1,6 @@
 package csv_handling;
 
+import data_structures.MultiHashMap;
 import elements.ConPalmonMove;
 import elements.Effectivity;
 import elements.Move;
@@ -14,17 +15,18 @@ import java.util.HashMap;
 public class CSV_Reader // extends Thread
 {
     // Paths
-    final String path_palmon = "/Users/i589533/IdeaProjects/Palmon_Game/src/csv_dateien/palmon.csv"; // Path Palmon
-    final String path_move = "/Users/i589533/IdeaProjects/Palmon_Game/src/csv_dateien/moves.csv";
-    String path_effectivity  = "/Users/i589533/IdeaProjects/Palmon_Game/src/csv_dateien/effectivity.csv";
-    // final String path_palmonmove = "C://Users//Fey//IdeaProjects//AA_Latest_Palmon//src//csv_dateien//palmon_move.csv";
+    final String path_palmon = "C://Users//Fey//IdeaProjects//AA_Latest_Palmon//src//csv_dateien//palmon.csv"; // Path Palmon
+    final String path_move = "C://Users//Fey//IdeaProjects//AA_Latest_Palmon//src//csv_dateien//moves.csv";
+    String path_effectivity  = "C://Users//Fey//IdeaProjects//AA_Latest_Palmon//src//csv_dateien//effectivity.csv";
+    final String path_palmonmove = "C://Users//Fey//IdeaProjects//AA_Latest_Palmon//src//csv_dateien//palmon_move.csv";
 
     // HashMaps
     public HashMap <Integer, Palmon> palmon_db = new HashMap <>(); // Storage medium for Palmon, Key: ID
     public HashMap<Integer, Move> move_db = new HashMap<>(); // Storage medium for Move, Key: ID
 
-    public HashMap<Integer, ConPalmonMove> palsMoves = new HashMap<>(); // All Moves for the Palmon, Key: Palmon ID
-    public HashMap<Integer, ConPalmonMove> movesForPals = new HashMap<>(); // All Moves listed with further information out of CSV PalmonMove, Key: Move ID
+    // own Data structure MultiHashMap
+    public MultiHashMap<Integer, Move> palsMoves = new MultiHashMap<>(); // All Moves for the Palmon, Key: Palmon ID
+    public MultiHashMap<Move, Integer> movesForPals = new MultiHashMap<>(); // All Moves listed with further information out of CSV PalmonMove, Key: Move ID
 
     // ArrayLists
     ArrayList<Effectivity> effectivity_db  = new ArrayList <>(); // Storage medium for Effectivity
@@ -158,5 +160,49 @@ public class CSV_Reader // extends Thread
         }
     }
 
-    //TODO DU HAST DIE PALMON MOVE DINGENS EINFACH GELÖSCHT...
+    public void PalmonMoveDataReader()
+    {
+        int palmonId;
+        Move move;
+        int level;
+
+        try (BufferedReader br = new BufferedReader(new FileReader(path_palmonmove)))
+        {
+            boolean reading = true;
+            br.readLine(); //a skipped: not needed since it is a header
+            String dataset; // current record of the CSV
+
+            while(reading) // reads until there are no more records available.
+            {
+                dataset = br.readLine(); // for storing the current line of the CSV file
+
+                if(dataset == null) // if the current record is empty
+                {
+                    reading = false; // reading is set to false and the loop doesn't execute another iteration
+                }
+                else
+                {
+                    String [] palmonMoveDetails = dataset.split(";"); // splitting the dataset into its pieces
+
+                    palmonId = Integer.parseInt(palmonMoveDetails[0]);
+                    move = move_db.get(Integer.parseInt(palmonMoveDetails[1])); // searching for the correct move
+                    level = Integer.parseInt(palmonMoveDetails[2]); // pre saving the level
+
+                    // ConPalmonMove conpalmonmove = new ConPalmonMove(palmon, move, level);
+
+                    palsMoves.put(palmonId, move); // HashMap, Key Palmons
+                    movesForPals.put(move, palmonId); // HashMap, Key Moves
+                }
+            }
+        }
+        catch (FileNotFoundException e)
+        { // applies when there is no file
+            System.err.println("The PalmonMove file was not found. Please check the file path and restart the program.");
+            System.exit(0); // ends the program
+        }
+        catch(Exception e)
+        {
+            System.out.println("Unexpected issue (PalmonMove). Please contact support (and run screaming in circles).");
+        }
+    }
 }

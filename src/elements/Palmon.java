@@ -27,16 +27,9 @@ public class Palmon // constructor
         speed   = Integer.parseInt(palmondetails[9]);
     }
 
-    public boolean speedTest(Palmon enemy)
+    public int speed()
     {
-        boolean palmonFaster = false; // if boolean is true, player is faster
-
-        // if enemys speed is higher than players speed, enemy starts
-        if(speed > enemy.speed)
-        {
-            palmonFaster = true;
-        }
-        return palmonFaster; // return whos faster
+        return speed;
     }
 
     public String getTypeOne()

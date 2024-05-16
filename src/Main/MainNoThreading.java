@@ -18,7 +18,7 @@ public class MainNoThreading
         data.run();
         data.PalmonDataReader();
         data.MoveDataReader();
-        data.
+        data.PalmonMoveDataReader();
         data.EffectivityDataReader();
         game.run();
     }

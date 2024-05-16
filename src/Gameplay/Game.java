@@ -156,7 +156,7 @@ public class Game // extends Thread
     {
         for(int i = 1; i <= teamsize; i++)
         {
-            HashSet<String> types = searching.saveAllTypes(data);
+            HashSet<String> types = searching.saveAllPalmonTypes(data);
             for(String alltypes: types)
             {
                 if(!alltypes.equals("no type found."))
@@ -168,7 +168,7 @@ public class Game // extends Thread
             String type = "";
             type = print.printssc("What type should the " + i + ". Palmon be? (please type in the name)", type);
 
-            HashMap<String, Palmon> selected_type = searching.sortByFirstType(type, data);
+            HashMap<String, Palmon> selected_type = searching.sortByPalmonType(type, data);
             HashSet<String> palmon_names = new HashSet<>(selected_type.keySet()); // Speichern aller Keys der HashMap, also die Namen aller Palmons
 
             int count = 0; // counter auf 0 setzen

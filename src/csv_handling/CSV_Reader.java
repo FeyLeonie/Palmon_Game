@@ -22,10 +22,10 @@ public class CSV_Reader // extends Thread
 
     // HashMaps
     public HashMap <Integer, Palmon> palmon_db = new HashMap <>(); // Storage medium for Palmon, Key: ID
-    public HashMap<Integer, Move> move_db = new HashMap<>(); // Storage medium for Move, Key: ID
+    public static HashMap<Integer, Move> move_db = new HashMap<>(); // Storage medium for Move, Key: ID
 
     // own Data structure MultiHashMap
-    public MultiHashMap<Integer, Move> palsMoves = new MultiHashMap<>(); // All Moves for the Palmon, Key: Palmon ID
+    public static MultiHashMap<Integer, Move> palsMoves = new MultiHashMap<>(); // All Moves for the Palmon, Key: Palmon ID
     public MultiHashMap<Move, Integer> movesForPals = new MultiHashMap<>(); // All Moves listed with further information out of CSV PalmonMove, Key: Move ID
 
     // ArrayLists
@@ -190,7 +190,7 @@ public class CSV_Reader // extends Thread
 
                     // ConPalmonMove conpalmonmove = new ConPalmonMove(palmon, move, level);
 
-                    palsMoves.put(palmonId, move); // HashMap, Key Palmons
+                    palsMoves.put(palmonId, move); // MultiHashMap, Key Palmons
                     movesForPals.put(move, palmonId); // HashMap, Key Moves
                 }
             }

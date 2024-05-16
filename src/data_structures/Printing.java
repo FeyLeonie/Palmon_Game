@@ -4,6 +4,7 @@ import java.util.Scanner;
 
 public class Printing
 {
+    // printing with Scanner for Integer
     public int printsc(String text, int scworth)
     {
         Scanner sc = new Scanner(System.in);
@@ -13,7 +14,7 @@ public class Printing
         return scworth;
     }
 
-    // printing for String
+    // printing with Scanner for String
     public String printssc(String text, String scworth)
     {
         Scanner sc = new Scanner(System.in);

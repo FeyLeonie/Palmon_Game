@@ -1,7 +1,6 @@
 package csv_handling;
 
 import data_structures.MultiHashMap;
-import elements.ConPalmonMove;
 import elements.Move;
 import elements.Palmon;
 
@@ -19,7 +18,7 @@ public class CSV_Searching extends Thread
         this.data = data;
     }
 
-    public HashSet<String> saveAllTypes(CSV_Reader data)
+    public HashSet<String> saveAllPalmonTypes(CSV_Reader data)
     {
         // HashSet to store all possible types
         HashSet<String> types = new HashSet<>();
@@ -32,7 +31,7 @@ public class CSV_Searching extends Thread
         return types;
     }
 
-    public HashMap<String, Palmon> sortByFirstType(String preferred_type, CSV_Reader data)
+    public HashMap<String, Palmon> sortByPalmonType(String preferred_type, CSV_Reader data)
     {
         HashMap<Integer, Palmon> palmon_db = data.palmon_db;
 
@@ -163,11 +162,12 @@ public class CSV_Searching extends Thread
         }
     }
 
+    // collects all Moves for the Palmon given (int id) and puts them into an ArrayList
     public ArrayList<Move> assembleMovesOnlyForPalmon(int id, CSV_Reader data)
     {
         //TODO Working?
         ArrayList<Move> palmon_move = new ArrayList<>(); // the possible Moves for the Palmon will be saved in here
-        MultiHashMap<Integer, Move> palsMoves = data.palsMoves; // "importing" the MultiHashMap with all the Palmon IDs and the possible Moves
+        MultiHashMap<Integer, Move> palsMoves = CSV_Reader.palsMoves; // "importing" the MultiHashMap with all the Palmon IDs and the possible Moves
 
         // Retrieve the list of ConPalmonMove objects associated with the Palmon ID
         List<Move> palmonMoves = palsMoves.get(id);

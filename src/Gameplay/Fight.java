@@ -11,11 +11,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 
-public class Fight
+public class Fight extends Printing
 {
     public Game game;
     public CSV_Reader data;
-    public Printing print;
     public ArrayList<Effectivity> effectivity_db; // CSV_Reader
 
     // saving the Index of the Move in the ArrayList to update Max Usages
@@ -102,11 +101,11 @@ public class Fight
             defender.adjustHp(damage); // adjusting the defenders HP
 
             attack.useMove(); // increase the Move max usages by one
-            print.print("The hit was successful!" +attacker.getName()+ " made " +damage+ " hp damage to " +defender.getName());
+            print("The hit was successful!" +attacker.getName()+ " made " +damage+ " hp damage to " +defender.getName());
         }
         else
         {
-            print.print(attacker.getName()+ " didnt hit. Maybe next time");
+            print(attacker.getName()+ " didnt hit. Maybe next time");
         }
 
         MoveHashMap.get(attacker.getId()).get(index).useMove();
@@ -148,31 +147,33 @@ public class Fight
 
         Move tempMove;
         // Printing out every Move the Player can choose from with its damage
-        for(int i = 0; i < playersMoves.size(); i++)
+        for (Move playersMove : playersMoves)
         {
-            tempMove = playersMoves.get(i);
-
-            if(tempMove !=null)
+            tempMove = playersMove;
+            if (tempMove != null)
             {
-                print.print("Move " + tempMove.getName()+ " with possible damage: " + tempMove.getDamage());
-            }
-            else
-            {
-                print.print("Move ist null...");
+                if (tempMove.getDamage() != 0)
+                {
+                    print.print("Move " + tempMove.getName() + " with possible damage: " + tempMove.getDamage());
+                }
             }
         }
 
         String choice = "";
-        print.printssc("These are the Moves you can choose one. Please type in the name of your preferred Move", choice); // letting the Player choose a Move
+        choice = print.printssc("These are the Moves you can choose one. Please type in the name of your preferred Move", choice); // letting the Player choose a Move
 
         Move playerAttack = null;
 
         // Finding the correct Move based on the player's choice
-        for (int i = 0; i < playersMoves.size(); i++)
+        //TODO irgendwie sind immer wieder Moves null
+        for (int i = 1; i <= playersMoves.size(); i++)
         {
-            if (playersMoves.get(i).getName().equals(choice))
+            Move move = playersMoves.get(i);
+            String moveName = move.getName();
+
+            if (moveName.equals(choice))
             {
-                playerAttack = playersMoves.get(i); // save the selected Move
+                playerAttack = move; // save the selected Move
                 playerMoveIndex = i; // Save the index of the selected Move
                 break; // Exit the loop once the Move is found
             }
@@ -223,7 +224,7 @@ public class Fight
 
     public void playerWon(Queue<Palmon> playerPalmons)
     {
-        print.print("You won! CONGRATULATIONS! Here are the names of your Palmons that supported you...");
+        print("You won! CONGRATULATIONS! Here are the names of your Palmons that supported you...");
         while(playerPalmons.getQueueSize() != 0)
         {
             System.out.println(playerPalmons.showTop().getName()); // printing out the Palmon
@@ -233,6 +234,6 @@ public class Fight
 
     public void playerLost()
     {
-        print.print("You sadly lost, sorry for that :( But dont be sad, I´m sure you´ll win next round, try again!");
+        print("You sadly lost, sorry for that :( But dont be sad, I´m sure you´ll win next round, try again!");
     }
 }

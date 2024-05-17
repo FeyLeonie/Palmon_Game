@@ -11,8 +11,7 @@ public class MainNoThreading
         // Erstellen der Instanzen der Klassen
         CSV_Reader data = new CSV_Reader();
         CSV_Searching selection = new CSV_Searching(data);
-        Printing print = new Printing();
-        Game game = new Game(data, selection, print);
+        Game game = new Game(data, selection);
 
         // Erstellen und Starten der Threads für jede Klasse
         data.run();

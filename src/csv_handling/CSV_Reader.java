@@ -12,7 +12,7 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class CSV_Reader // extends Thread
+public class CSV_Reader extends Thread
 {
     // Paths
     final String path_palmon = "C://Users//Fey//IdeaProjects//AA_Latest_Palmon//src//csv_dateien//palmon.csv"; // Path Palmon
@@ -21,7 +21,7 @@ public class CSV_Reader // extends Thread
     final String path_palmonmove = "C://Users//Fey//IdeaProjects//AA_Latest_Palmon//src//csv_dateien//palmon_move.csv";
 
     // HashMaps
-    public HashMap <Integer, Palmon> palmon_db = new HashMap <>(); // Storage medium for Palmon, Key: ID
+    public static HashMap <Integer, Palmon> palmon_db = new HashMap <>(); // Storage medium for Palmon, Key: ID
     public static HashMap<Integer, Move> move_db = new HashMap<>(); // Storage medium for Move, Key: ID
 
     // own Data structure MultiHashMap

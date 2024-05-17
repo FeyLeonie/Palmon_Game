@@ -13,20 +13,17 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Random;
 
-public class Game // extends Thread
+public class Game extends Printing
 {
-    Printing print;
     CSV_Reader data;
     CSV_Searching searching;
-    Fight fight;
 
 
     public Queue<Palmon> playerPalmons;
     public Queue<Palmon> enemyPalmons;
 
-    public Game(CSV_Reader data, CSV_Searching selection, Printing print)
+    public Game(CSV_Reader data, CSV_Searching selection)
     {
-        this.print = print;
         this.data = data;
         this.searching = selection;
     }
@@ -34,22 +31,23 @@ public class Game // extends Thread
     // @Override
     public void run()
     {
-        Game game = new Game(data, searching, print);
+        Game game = new Game(data, searching);
         Fight fight = new Fight(game, data);
-        game.teamSettings(searching, fight, playerPalmons, enemyPalmons);
+        game.teamSettings(searching, fight);
     }
 
-    public void teamSettings(CSV_Searching searching, Fight fight, Queue<Palmon> playerPalmons, Queue<Palmon> enemyPalmons)
+    public void teamSettings(CSV_Searching searching, Fight fight)
     {
         // Team Settings Palmons Player
+        print("\n" + InitialMenu.playerName + ", you are now in the team settings. Here, you will assemble your team for battle and make adjustments to your opponent's team settings.");
 
         // asking for Players Teamsize
         int playersize = 0;
-        playersize = print.printsc("Amount of Palmons in your Team?", playersize);
+        playersize = printsc("How many Palmons would you like to have in your team, " +InitialMenu.playerName+ "? Choose wisely.", playersize);
 
         // asking for Team assembling method
         int selection = 0;
-        selection = print.printsc("How do you want to assemble your team? \\(1) randomly \\(2) by id \\(3) by type", selection);
+        selection = printsc("How do you want to assemble your team? \n(1) randomly \n(2) by id \n(3) by type", selection);
 
         // assembling the Palmons for the Player (regarding the choice the Player made)
         playerPalmons = new Queue<>();
@@ -76,7 +74,7 @@ public class Game // extends Thread
         // Team Settings Palmons Enemy
 
         int enemysize = 0;
-        enemysize = print.printsc("Amount of Palmons in your Enemys Team? \\(0) randomly", enemysize);
+        enemysize = printsc("How many Palmons would you like in your the team from " + InitialMenu.enemyName+ "? \n(0) randomly \n(type in your preferred number)", enemysize);
 
         while(enemysize == 0) // no if because Random could randomly choose 0 -> another round would be needed
         {
@@ -84,7 +82,7 @@ public class Game // extends Thread
             enemysize = r.nextInt(playersize * 2);
             if(enemysize != 0)
             {
-                print.print(enemysize + " Palmons will be fighting in your enemys team!");
+                print(enemysize + " Palmons will be fighting in your opponent's team, " + InitialMenu.enemyName+ "!");
             }
         }
 
@@ -95,13 +93,16 @@ public class Game // extends Thread
         // Setting Moves for Enemies Palmons
         HashMap<Integer, ArrayList<Move>> enemiesPalMoves = setMovesForPalmon(data, enemyPalmons);
 
+        //
+        print("Your team is set, " +InitialMenu.playerName+ ". Prepare for battle against " +InitialMenu.enemyName+ "! Let the clash of Palmons begin!");
+
         // Start the Fight
         fight.FightOverview(playerPalmons, enemyPalmons, enemiesPalMoves, playersPalMoves);
     }
 
     public Queue<Palmon> assembleRandomly(int teamsize, Queue<Palmon> team)
     {
-        HashMap<Integer, Palmon> palmon_db = data.palmon_db;
+        HashMap<Integer, Palmon> palmon_db = CSV_Reader.palmon_db;
 
         Random r = new Random();
         int randomIndex;
@@ -125,12 +126,12 @@ public class Game // extends Thread
 
     public Queue<Palmon> assembleById(int teamsize, Queue<Palmon> team)
     {
-        HashMap<Integer, Palmon> palmon_db = data.palmon_db;
+        HashMap<Integer, Palmon> palmon_db = CSV_Reader.palmon_db;
         int id = 0;
 
         for(int i = 0; i < teamsize; i++)
         {
-            id = print.printsc("select your next Palmon by tiping your preferred ID", id);
+            id = printsc("select your next Palmon by tiping your preferred ID", id);
 
             if(palmon_db.containsKey(id))
             {
@@ -138,7 +139,7 @@ public class Game // extends Thread
             }
             else
             {
-                print.print("No Palmon with preferred ID. Please choose a different ID");
+                print("No Palmon with preferred ID. Please choose a different ID");
                 if(i!=0)
                 {
                     i--;
@@ -166,7 +167,7 @@ public class Game // extends Thread
             }
 
             String type = "";
-            type = print.printssc("What type should the " + i + ". Palmon be? (please type in the name)", type);
+            type = printssc("What type should the " + i + ". Palmon be? (please type in the name)", type);
 
             HashMap<String, Palmon> selected_type = searching.sortByPalmonType(type, data);
             HashSet<String> palmon_names = new HashSet<>(selected_type.keySet()); // Speichern aller Keys der HashMap, also die Namen aller Palmons
@@ -176,7 +177,7 @@ public class Game // extends Thread
             {
                 if(count <= 15) // wenn 15 Namen ausgegeben wurden wird gestoppt, um den User nicht zu überfordern
                 {
-                    print.print(name);
+                    print(name);
                     count++;
                 }
                 else
@@ -186,7 +187,7 @@ public class Game // extends Thread
             }
 
             String decision = "";
-            decision = print.printssc("These are 15 Palmons of the desired type. Choose one (by entering its name).", decision);
+            decision = printssc("These are 15 Palmons of the desired type. Choose one (by entering its name).", decision);
             team.enqueue(selected_type.get(decision)); // putting the desired Palmon in the team Queue
         }
         return team;

@@ -65,6 +65,10 @@ public class Palmon // constructor
     public void adjustHp(double damage)
     {
         hp = hp - damage;
+        if(hp < 0)
+        {
+            hp = 0;
+        }
     }
 
     public double getHp()

@@ -24,7 +24,7 @@ public class CSV_Searching extends Thread
         HashSet<String> types = new HashSet<>();
 
         //  Iterating through the palmon_db to collect all types
-        for (Palmon palmon : data.palmon_db.values()) {
+        for (Palmon palmon : CSV_Reader.palmon_db.values()) {
             types.add(palmon.getTypeOne());
         }
 
@@ -33,7 +33,7 @@ public class CSV_Searching extends Thread
 
     public HashMap<String, Palmon> sortByPalmonType(String preferred_type, CSV_Reader data)
     {
-        HashMap<Integer, Palmon> palmon_db = data.palmon_db;
+        HashMap<Integer, Palmon> palmon_db = CSV_Reader.palmon_db;
 
         HashMap<String, Palmon> type1_normal = new HashMap<>();
         HashMap<String, Palmon> type1_fighting = new HashMap<>();

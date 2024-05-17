@@ -20,6 +20,8 @@ public class Fight extends Printing
     int playerMoveIndex = 0;
     int enemyMoveIndex = 0;
 
+    Queue <Palmon> playersDefeatedPalmons;
+
     public Fight(Game game, CSV_Reader data)
     {
         this.game = game;
@@ -30,67 +32,86 @@ public class Fight extends Printing
     int round = 0;
     public void FightOverview(Queue<Palmon> playerPalmons, Queue<Palmon> enemyPalmons, HashMap<Integer, ArrayList<Move>> enemiesPalMoves, HashMap<Integer, ArrayList<Move>> playersPalMoves)
     {
+        // Introducing the Fight
+        print("Welcome to the arena, " + InitialMenu.playerName + ". Prepare to fight against " + InitialMenu.enemyName + ". May the best Palmon Team win!");
+
+        playersDefeatedPalmons = new Queue<>();
 
         Palmon playerPalmon = playerPalmons.dequeue(); // load first Palmon into the Fight
         Palmon enemyPalmon = enemyPalmons.dequeue(); // load first Palmon into the Fight
 
-        //TODO Endlosschleife!!
-        while(playerPalmons.getQueueSize() != 0 && enemyPalmons.getQueueSize() != 0)
+        while(playerPalmon != null && enemyPalmon != null)
         {
             round++;
             print("The " +round+ ". round is about to start!");
 
+            print("The Palmons are in the arena and ready.");
+            print(InitialMenu.playerName + "'s Palmon " + playerPalmon.getName() + " faces off against " + InitialMenu.enemyName + "'s Palmon " + enemyPalmon.getName() + ". Let the battle begin!");
+
+            // TODO ab hier gibt es eine Exception beim Starten mit Threading
             Move enemyMove = chooseMoveEnemy(enemyPalmon, enemiesPalMoves);
             Move playerMove = chooseMovePlayer(playerPalmon, playersPalMoves);
 
-            while(playerPalmon.getHp() > 0 && enemyPalmon.getHp() > 0)
+            if(playerPalmon.speed() >= enemyPalmon.speed())
             {
-                if(playerPalmon.speed() >= enemyPalmon.speed())
+                //Player starts attacking
+                print("Your Palmon " +playerPalmon.getName()+ " is about to attack the Enemies Palmon " +enemyPalmon.getName()+ "! Ready to rumble?");
+                enemyPalmon = attackingSequence(playerPalmon, playerMove, enemyPalmon, playersPalMoves, playerMoveIndex);
+
+                if(enemyPalmon.getHp() > 0)
+                {
+                    // Enemy starts attacking
+                    print("The enemies Palmon " +enemyPalmon.getName()+ " is about to attack your Palmon " +playerPalmon.getName()+ "! Prepare yourself.");
+                    playerPalmon = attackingSequence(enemyPalmon, enemyMove, playerPalmon, enemiesPalMoves, enemyMoveIndex);
+                }
+                else
+                {
+                    // Enemy Palmon is already defeated and can not attack anymore
+                    print("You defeated the Enemies Palmon " +enemyPalmon.getName()+ "! Congrats on that, it can not attack anymore :(");
+                }
+            }
+            else
+            {
+                // Enemy starts attacking
+                print("The enemies Palmon " +enemyPalmon.getName()+ " is about to attack! Prepare yourself.");
+                playerPalmon = attackingSequence(enemyPalmon, enemyMove, playerPalmon, enemiesPalMoves, enemyMoveIndex);
+
+                if(playerPalmon.getHp() > 0)
                 {
                     //Player starts attacking
                     print("Your Palmon " +playerPalmon.getName()+ " is about to attack! Ready to rumble?");
                     enemyPalmon = attackingSequence(playerPalmon, playerMove, enemyPalmon, playersPalMoves, playerMoveIndex);
-
-                    if(enemyPalmon.getHp() > 0)
-                    {
-                        // Enemy starts attacking
-                        print("The enemies Palmon " +enemyPalmon.getName()+ " is about to attack!");
-                        playerPalmon = attackingSequence(enemyPalmon, enemyMove, playerPalmon, enemiesPalMoves, enemyMoveIndex);
-                    }
                 }
                 else
                 {
-                    // Enemy starts attacking
-                    print("The enemies Palmon " +enemyPalmon.getName()+ " is about to attack!");
-                    playerPalmon = attackingSequence(enemyPalmon, enemyMove, playerPalmon, enemiesPalMoves, enemyMoveIndex);
-
-                    if(playerPalmon.getHp() > 0)
-                    {
-                        //Player starts attacking
-                        print("Your Palmon " +playerPalmon.getName()+ " is about to attack! Ready to rumble?");
-                        enemyPalmon = attackingSequence(playerPalmon, playerMove, enemyPalmon, playersPalMoves, playerMoveIndex);
-                    }
+                    // Player Palmon is already defeated and can not attack anymore
+                    print("Your Palmon " +playerPalmon.getName()+ " got defeated by " +enemyPalmon.getName()+ ". It can not attack anymore :(");
                 }
             }
 
+            print("The " +round+ ". round is about to end! \nHere are the current stats...");
+            print("\nPlayers stats: \nCurrent Palmon fighting: " +playerPalmon.getName()+ " with " +playerPalmon.getHp()+ " HP left.");
+            print("\nEnemy stats: \nCurrent Palmon fighting: " +enemyPalmon.getName()+ " with " +enemyPalmon.getHp()+ " HP left.");
+
             if(playerPalmon.getHp() <= 0) // if Palmon is defeated
             {
-                if(playerPalmons.getQueueSize() == 0)
+                playersDefeatedPalmons.enqueue(playerPalmon);
+                if(playerPalmons.getQueueSize() == 0) // and if theres no Palmon in the Players Queue anymore
                 {
-                    playerLost();
+                    playerLost(); // the Player Lost
                     break;
                 }
-                playerPalmon = playerPalmons.dequeue(); // load next Palmon into fight
+                playerPalmon = playerPalmons.dequeue(); // otherwise: load next Palmon into fight
             }
 
             if(enemyPalmon.getHp() <= 0) // if Palmon is defeated
             {
-                if(enemyPalmons.getQueueSize() == 0)
+                if(enemyPalmons.getQueueSize() == 0)// and if theres no Palmon in the Enemies Queue anymore
                 {
-                    playerWon(playerPalmons);
+                    playerWon(playerPalmons, playerPalmon); // the Player won !!! (Glückwunsch Sebastiaaaan!!)
                     break;
                 }
-                enemyPalmon = enemyPalmons.dequeue(); // load next Palmon into fight
+                enemyPalmon = enemyPalmons.dequeue(); // otherwise: load next Palmon into fight
             }
         }
     }
@@ -115,6 +136,7 @@ public class Fight extends Printing
                 defender.adjustHp(damage); // adjusting the defenders HP
 
                 print("The hit was successful! " +attacker.getName()+ " made " +damage+ " hp damage to " +defender.getName());
+                print(defender.getName()+ " has " +defender.getHp()+ " HP left.");
             }
         }
         else
@@ -142,7 +164,7 @@ public class Fight extends Printing
 
         Move enemyAttack = enemiesMoves.get(randomMove); // Saving the current Move
 
-        while(enemyAttack.usagesLeft() <= 0 || enemyAttack == null) // if selected Move is already on Max Usages this will be needed
+        while(enemyAttack.usagesLeft() <= 0) // if selected Move is already on Max Usages this will be needed
         {
             r = new Random();
             randomMove = r.nextInt(enemiesMoves.size());
@@ -157,58 +179,61 @@ public class Fight extends Printing
     // Output: playerAttack (Players Move)
     public Move chooseMovePlayer(Palmon playerPalmon, HashMap<Integer, ArrayList<Move>> playersPalMoves)
     {
-        Printing print = new Printing();
+        // telling the Player where he currently is
+        print("It's time to choose a Move for your Palmon, " +InitialMenu.playerName);
 
         // Let the Player choose the preferred Move
-
         // saving the ArrayList with all the Moves of the current Palmon
         ArrayList<Move> playersMoves;
         playersMoves = playersPalMoves.get(playerPalmon.getId());
 
         Move tempMove;
         // Printing out every Move the Player can choose from with its damage
+        print("Possible Moves to choose from:");
         for (Move playersMove : playersMoves)
         {
             tempMove = playersMove;
             if (tempMove != null)
             {
-                    print.print("Move " + tempMove.getName() + " with possible damage: " + tempMove.getDamage());
-            }
-            else
-            {
-                print("null");
+                    print(tempMove.getName() + " with possible damage: " + tempMove.getDamage());
             }
         }
 
         String choice = "";
-        choice = print.printssc("These are the Moves you can choose one. Please type in the name of your preferred Move", choice); // letting the Player choose a Move
-
         Move playerAttack = null;
+        boolean moveFound = false;
 
-        // Finding the correct Move based on the player's choice
-        //TODO irgendwie sind immer wieder Moves null
-        for (int i = 1; i <= playersMoves.size(); i++)
+        while(!moveFound)
         {
-            Move move = playersMoves.get(i);
-            String moveName = move.getName();
+            choice = printssc("Please type in the name of your preferred Move", choice); // letting the Player choose a Move
 
-            if (moveName.equals(choice))
+            // Finding the correct Move based on the player's choice
+            for (int i = 0; i < playersMoves.size(); i++)
             {
-                playerAttack = move; // save the selected Move
-                playerMoveIndex = i; // Save the index of the selected Move
-                break; // Exit the loop once the Move is found
+                Move move = playersMoves.get(i);
+                String moveName = move.getName();
+
+                if (moveName.equals(choice))
+                {
+                    playerAttack = move; // save the selected Move
+                    playerMoveIndex = i; // Save the index of the selected Move
+                    moveFound = true;
+                    break; // Exit the loop once the Move is found
+                }
+                else
+                {
+                    print("Your chosen Move was not found. Type in again.");
+                }
             }
         }
 
+
         if(playerAttack.usagesLeft() <= 0) // if selected Move is already on Max Usages this will be needed
         {
-           print.print("This Move is not usable anymore. You used it too often. Please choose a different Move");
+           print("This Move is not usable anymore. You used it too often. Please choose a different Move");
            chooseMovePlayer(playerPalmon, playersPalMoves);
         }
-
         // saving the Index of the Move to update the Max Usages when using the Move
-
-
         return playerAttack;
     }
 
@@ -261,13 +286,26 @@ public class Fight extends Printing
         return hits;
     }
 
-    public void playerWon(Queue<Palmon> playerPalmons)
+    public void playerWon(Queue<Palmon> playerPalmons, Palmon playerPalmon)
     {
         print("You won! CONGRATULATIONS! Here are the names of your Palmons that supported you...");
-        while(playerPalmons.getQueueSize() != 0)
+
+        while(playerPalmons.getQueueSize() != 0) // Printing out the Palmons that were in the Players team but didnt fight
         {
             System.out.println(playerPalmons.showTop().getName()); // printing out the Palmon
             playerPalmons.dequeue(); // Pushing the Palmon out of the Stack
+        }
+
+        if(playerPalmon != null) // Printing out the Palmon that was in the last fight
+        {
+            System.out.println(playerPalmon.getName());
+        }
+
+        print("And not to forget about the Palmons that went at their limit to help you. The ones who got defeated...");
+        while(playersDefeatedPalmons.getQueueSize() != 0) // Printing out the defeated Palmons
+        {
+            System.out.println(playersDefeatedPalmons.showTop().getName());
+            playersDefeatedPalmons.dequeue();
         }
     }
 

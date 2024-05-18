@@ -1,9 +1,11 @@
 package elements;
 
+import data_structures.Normalizer;
+
 public class Move
 {
     final int id;
-    final String name;
+    String name;
     final int damage;
     final int accuracy;
     final String type;
@@ -31,6 +33,11 @@ public class Move
         return usagesLeft;
     }
 
+    public int getID()
+    {
+        return id;
+    }
+
     public String getName()
     {
         return name;
@@ -44,5 +51,10 @@ public class Move
     public int getAccuracy()
     {
         return accuracy;
+    }
+
+    public void normalizeMoveName()
+    {
+        name = Normalizer.normalize(name);
     }
 }

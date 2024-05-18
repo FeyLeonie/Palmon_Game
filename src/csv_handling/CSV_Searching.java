@@ -1,6 +1,5 @@
 package csv_handling;
 
-import data_structures.MultiHashMap;
 import elements.ConPalmonMove;
 import elements.Move;
 import elements.Palmon;
@@ -232,8 +231,10 @@ public class CSV_Searching extends Thread
                 }
             }
 
+            Move tempMove = tempPalmonMove.get(maxIndex);
+            tempMove.normalizeMoveName();
             // add the move with the maximum damage to the ArrayList
-            fourStrongestMoves.add(tempPalmonMove.get(maxIndex));
+            fourStrongestMoves.add(tempMove);
             tempPalmonMove.remove(maxIndex); // removing the move to find the next one with the highest damage
         }
         return fourStrongestMoves;

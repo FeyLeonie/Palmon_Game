@@ -5,13 +5,13 @@ import java.util.Scanner;
 public class Printing
 {
     // printing with Scanner for Integer
-    public int printsc(String text, int scworth) {
+    public int printWithScInt(String input, int scworth) {
         Scanner sc = new Scanner(System.in);
         boolean validInput = false;
 
         do {
             try {
-                System.out.println(text);
+                System.out.println(input);
                 scworth = sc.nextInt();
                 if (scworth < 0) {
                     throw new IllegalArgumentException("Negative numbers are not allowed.");
@@ -30,13 +30,13 @@ public class Printing
     }
 
     // printing with Scanner for Integer with upper bound
-    public int printsc_ub(String text, int scworth, int upperbound) {
+    public int printWithScIntUpperBound(String input, int scworth, int upperbound) {
         Scanner sc = new Scanner(System.in);
         boolean validInput = false;
 
         do {
             try {
-                System.out.println(text);
+                System.out.println(input);
                 scworth = sc.nextInt();
                 if (scworth < 0)
                 {
@@ -59,13 +59,13 @@ public class Printing
         return scworth;
     }
 
-    public int printsc_ublb(String text, int scworth, int upperbound, int lowerbound) {
+    public int printWithScIntUpperLowerBound(String input, int scworth, int upperbound, int lowerbound) {
         Scanner sc = new Scanner(System.in);
         boolean validInput = false;
 
         do {
             try {
-                System.out.println(text);
+                System.out.println(input);
                 scworth = sc.nextInt();
                 if(scworth > upperbound)
                 {
@@ -89,7 +89,8 @@ public class Printing
     }
 
     // printing with Scanner for String
-    public String printssc(String text, String scworth) {
+    public String printWithScString(String input, String scworth)
+    {
         Scanner sc = new Scanner(System.in);
         boolean validInput = false;
 
@@ -97,7 +98,7 @@ public class Printing
         {
             try
             {
-                System.out.println(text);
+                System.out.println(input);
                 scworth = sc.nextLine();
                 validInput = true;
             }

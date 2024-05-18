@@ -1,6 +1,7 @@
 package Gameplay;
 
 import data_structures.Printing;
+import data_structures.Normalizer;
 
 public class InitialMenu extends Thread
 {
@@ -13,7 +14,7 @@ public class InitialMenu extends Thread
                                                     "██      ███      ███ ████████  ███       ██      █████      ██     ███\n";
     static int language = 0;
     static String playerName = "";
-    static String enemyName;
+    static String enemyName = "";
     
     Printing print;
 
@@ -28,7 +29,7 @@ public class InitialMenu extends Thread
 
         do
         {
-            language = print.printsc("Please choose your language. \n(1) English (default) \n(2) Deutsch", language);
+            language = print.printWithScInt("Please choose your language. \n(1) English (default) \n(2) Deutsch", language);
 
             if(language != 1 && language != 2)
             {
@@ -41,9 +42,27 @@ public class InitialMenu extends Thread
         print.print("\nWelcome to Palmon, where every battle defines destiny. \nIn this arena, strength is the only language spoken, so prepare yourself for a hard fight! \nRise or fall, the choice is yours. Let the combat begin...");
 
 
-        playerName = print.printssc("\nWhat's your name, warrior?", playerName);
+        while(playerName.equals(""))
+        {
+            playerName = print.printWithScString("\nWhat's your name, warrior?", playerName);
+            playerName = Normalizer.normalize(playerName); // normalizing the players Name
 
-        enemyName = print.printssc("\nPrepare to face your destiny, " +playerName + ". Whats the name of the opponent who dares to challenge you in the arena of Palmon?", enemyName);
+            if(playerName.isEmpty())
+            {
+                print.print("Please type in a name. Numbers will be removed");
+            }
+        }
+
+        while(enemyName.equals(""))
+        {
+            enemyName = print.printWithScString("\nPrepare to face your destiny, " +playerName + ". Whats the name of the opponent who dares to challenge you in the arena of Palmon?", enemyName);
+            enemyName = Normalizer.normalize(enemyName); // normalizing the enemies Name
+
+            if(enemyName.isEmpty())
+            {
+                print.print("Please type in a name. Numbers will be removed");
+            }
+        }
 
         print.print("\nAlright, lets not waste any more time. Prepare yourself, and let the battle against " +enemyName+ " begin, " + playerName + "!");
     }

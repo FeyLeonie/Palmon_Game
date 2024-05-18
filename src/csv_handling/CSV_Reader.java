@@ -11,14 +11,14 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class CSV_Reader extends Thread
+public class CSV_Reader extends Thread implements CSV
 {
 
     // Paths
-    final String path_palmon = "/Users/i589533/IdeaProjects/Palmon_Game_LatestOne_1705/src/csv_data/palmon.csv"; // Path Palmon
-    final String path_move = "/Users/i589533/IdeaProjects/Palmon_Game_LatestOne_1705/src/csv_data/moves.csv";
-    String path_effectivity  = "/Users/i589533/IdeaProjects/Palmon_Game_LatestOne_1705/src/csv_data/effectivity.csv";
-    final String path_palmonmove = "/Users/i589533/IdeaProjects/Palmon_Game_LatestOne_1705/src/csv_data/palmon_move.csv";
+    String path_palmon = "src/Resources/CSV_Data/palmon.csv"; // Path Palmon
+    String path_move = "src/Resources/CSV_Data/moves.csv";
+    String path_effectivity  = "src/Resources/CSV_Data/effectivity.csv";
+    String path_palmonmove = "src/Resources/CSV_Data/palmon_move.csv";
 
     // HashMaps
     public static HashMap <Integer, Palmon> palmon_db = new HashMap <>(); // Storage medium for Palmon, Key: ID
@@ -158,7 +158,6 @@ public class CSV_Reader extends Thread
         }
     }
 
-    //TODO das hier ist noch nicht ganz sauber
     public void PalmonMoveDataReader()
     {
         int palmonId;

@@ -2,6 +2,7 @@ package Gameplay;
 
 import csv_handling.CSV_Reader;
 import csv_handling.CSV_Searching;
+import data_structures.Normalizer;
 import data_structures.Printing;
 import elements.Palmon;
 import elements.Move;
@@ -15,9 +16,8 @@ import java.util.Random;
 
 public class Game extends Printing
 {
-    CSV_Reader data;
-    CSV_Searching searching;
-
+    CSV_Reader data; // for reading the CSV
+    CSV_Searching searching; // has some Methods that will be needed
 
     public Queue<Palmon> playerPalmons;
     public Queue<Palmon> enemyPalmons;
@@ -47,7 +47,7 @@ public class Game extends Printing
         do
         {
             // I chose an upper bound of 100 Palmons for max amout of Palmons in a Team since more is not realistic (and 100 is even very much)
-            playersize = printsc_ub("How many Palmons would you like to have in your team, " +InitialMenu.playerName+ "? Choose wisely.", playersize, 100);
+            playersize = printWithScIntUpperBound("How many Palmons would you like to have in your team, " +InitialMenu.playerName+ "? Choose wisely.", playersize, 100);
 
             // testing, if Input was invalid
             if(playersize == 0)
@@ -60,7 +60,7 @@ public class Game extends Printing
         int answer = 0;
         do
         {
-            answer = printsc("Do you want to assign a Level Range for your Palmons and the Palmons from " +InitialMenu.enemyName+ "? \n(1) yes \n(2) no", answer);
+            answer = printWithScInt("Do you want to assign a Level Range for your Palmons and the Palmons from " +InitialMenu.enemyName+ "? \n(1) yes \n(2) no", answer);
 
             if(answer != 1 && answer != 2)
             {
@@ -79,7 +79,7 @@ public class Game extends Printing
             {
                 // the Level Range must be at least 20 to make sure that Moves can be found
                 // Working with 0-10 to make it easier for the User, Multiplying it with 10 later on to get the correct value
-                minimumLevel = printsc("Please choose the Minimum Level between 0-8", minimumLevel); // Let the User choose a Level between 0 and 8
+                minimumLevel = printWithScInt("Please choose the Minimum Level between 0-8", minimumLevel); // Let the User choose a Level between 0 and 8
 
                 if(minimumLevel > 8) // MinimumLevel must not be above 8 (8*10 will be 80 later on and Level Range must be 20 so Max could be 100 with Min 80) to make sure Level Range can be at least 20 since Max Level is 100
                 {
@@ -87,7 +87,7 @@ public class Game extends Printing
                 }
             }while(minimumLevel > 8);
 
-            maximumLevel = printsc_ublb("Please choose the Maximum Level. It has to be between " +(minimumLevel+2)+ " and 10.", maximumLevel, 10, minimumLevel+2);
+            maximumLevel = printWithScIntUpperLowerBound("Please choose the Maximum Level. It has to be between " +(minimumLevel+2)+ " and 10.", maximumLevel, 10, minimumLevel+2);
 
             // Setting the Level to the correct value
             minimumLevel *= 10;
@@ -98,7 +98,7 @@ public class Game extends Printing
         int selection = 0;
         do
         {
-            selection = printsc("How do you want to assemble your team? \n(1) randomly \n(2) by id \n(3) by type", selection);
+            selection = printWithScInt("How do you want to assemble your team? \n(1) randomly \n(2) by id \n(3) by type", selection);
 
             if(selection != 1 && selection != 2 && selection != 3)
             {
@@ -130,7 +130,7 @@ public class Game extends Printing
 
         // Team Settings Palmons Enemy
         int enemysize = 0;
-        enemysize = printsc_ub("How many Palmons would you like in the team from " + InitialMenu.enemyName+ "? \n(0) randomly \n(type in your preferred number)", enemysize, 1092);
+        enemysize = printWithScIntUpperBound("How many Palmons would you like in the team from " + InitialMenu.enemyName+ "? \n(0) randomly \n(type in your preferred number)", enemysize, 1092);
 
         while(enemysize == 0) // no if because Random could randomly choose 0 -> another round would be needed
         {
@@ -203,10 +203,9 @@ public class Game extends Printing
         Random r = new Random();
         int randomLevel;
 
-        //TODO nochmal prüfen, ob das funktioniert
         while(team.getQueueSize() < teamsize)
         {
-            id = printsc("select your next Palmon by tiping your preferred ID", id);
+            id = printWithScInt("select your next Palmon by tiping your preferred ID", id);
 
             if(palmon_db.containsKey(id)) // if a Palmon with the preferred ID exists
             {
@@ -217,6 +216,7 @@ public class Game extends Printing
                     palmon.assignLevel(randomLevel); // assign the randomLevel for the current Palmon
                 }
                 team.enqueue(palmon); // put the Palmon into the Queue
+                print("Palmon " +Normalizer.normalize(palmon.getName())+ " with your preferred ID " +palmon.getId()+ " was put in your team.");
             }
             else
             {
@@ -226,6 +226,7 @@ public class Game extends Printing
         return team;
         }
 
+    //TODO still glitches
     public Queue<Palmon> assembleByFirstType(int teamsize, CSV_Searching searching, Queue<Palmon> team, int minimumLevel, int maximumLevel)
     {
         Random r = new Random();
@@ -233,12 +234,15 @@ public class Game extends Printing
 
         for(int i = 1; i <= teamsize; i++)
         {
+            print("\nPossible types to choose from:");
+
             HashSet<String> types = searching.saveAllPalmonTypes(data);
+
             for(String alltypes: types)
             {
                 if(!alltypes.equals("no type found."))
                 {
-                    System.out.println(alltypes);
+                    System.out.println(Normalizer.normalize(alltypes));
                 }
             }
 
@@ -246,13 +250,14 @@ public class Game extends Printing
             boolean typeExists = false;
             while(!typeExists)
             {
-                type = printssc("What type should the " + i + ". Palmon be? (please type in the name)", type);
+                type = printWithScString("\nWhat type should the " + i + ". Palmon be? (please type in the name)", type);
 
+                type = type.toLowerCase();
                 typeExists = types.contains(type);
 
                 if(!typeExists)
                 {
-                    print("type does not exist. Please try again.");
+                    print("type was not found. Please try again.");
                 }
             }
 
@@ -265,7 +270,7 @@ public class Game extends Printing
             {
                 if(count <= 15) // if 15 names have been output, it will stop to avoid overwhelming the user.
                 {
-                    print(name);
+                    print(Normalizer.normalize(name));
                     count++;
                 }
                 else
@@ -274,18 +279,18 @@ public class Game extends Printing
                 }
             }
 
-            //TODO prüfen, ob das klappt
+
             String decision = "";
             boolean decisionCorrect = false;
             while(!decisionCorrect)
             {
-                decision = printssc("These are 15 Palmons of the desired type. Choose one (by entering its name).", decision);
-
+                decision = printWithScString("These are 15 Palmons of the desired type " +Normalizer.normalize(type)+  ". Choose one (by entering its name).", decision);
+                decision = decision.toLowerCase();
                 decisionCorrect = palmon_names.contains(decision);
 
                 if(!decisionCorrect)
                 {
-                    print("No Palmon with the Name " +decision+ " found. Please try again.");
+                    print("No Palmon with the Name " +Normalizer.normalize(decision)+ " found. Please try again.");
                 }
             }
 

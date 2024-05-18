@@ -17,4 +17,14 @@ public class ConPalmonMove // Connection class for Palmon and Moves
     {
         return move;
     }
+
+    public int getLevel()
+    {
+        return level;
+    }
+
+    public Palmon getPalmon()
+    {
+        return palmon;
+    }
 }

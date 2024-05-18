@@ -43,37 +43,38 @@ public class Fight extends Printing
         while(playerPalmon != null && enemyPalmon != null)
         {
             round++;
-            print("The " +round+ ". round is about to start!");
+            print("\nThe " +round+ ". round is about to start!");
 
+            //TODO Palmons NULL
             print("The Palmons are in the arena and ready.");
-            print(InitialMenu.playerName + "'s Palmon " + playerPalmon.getName() + " faces off against " + InitialMenu.enemyName + "'s Palmon " + enemyPalmon.getName() + ". Let the battle begin!");
+            print(playerPalmon.getName()+ ", the Palmon from " +InitialMenu.playerName+" faces off against " +enemyPalmon.getName()+ ", the Palmon from " +InitialMenu.enemyName+ ". Let the battle begin!\n");
 
             // TODO ab hier gibt es eine Exception beim Starten mit Threading
             Move enemyMove = chooseMoveEnemy(enemyPalmon, enemiesPalMoves);
-            Move playerMove = chooseMovePlayer(playerPalmon, playersPalMoves);
+            Move playerMove = chooseMovePlayer(playerPalmon, enemyPalmon, playersPalMoves);
 
-            if(playerPalmon.speed() >= enemyPalmon.speed())
+            if(playerPalmon.getSpeed() >= enemyPalmon.getSpeed())
             {
                 //Player starts attacking
-                print("Your Palmon " +playerPalmon.getName()+ " is about to attack the Enemies Palmon " +enemyPalmon.getName()+ "! Ready to rumble?");
+                print("\nYour Palmon " +playerPalmon.getName()+ " is about to attack the Enemies Palmon " +enemyPalmon.getName()+ "! Ready to rumble?");
                 enemyPalmon = attackingSequence(playerPalmon, playerMove, enemyPalmon, playersPalMoves, playerMoveIndex);
 
                 if(enemyPalmon.getHp() > 0)
                 {
                     // Enemy starts attacking
-                    print("The enemies Palmon " +enemyPalmon.getName()+ " is about to attack your Palmon " +playerPalmon.getName()+ "! Prepare yourself.");
+                    print("\nThe enemies Palmon " +enemyPalmon.getName()+ " is about to attack your Palmon " +playerPalmon.getName()+ "! Prepare yourself.");
                     playerPalmon = attackingSequence(enemyPalmon, enemyMove, playerPalmon, enemiesPalMoves, enemyMoveIndex);
                 }
                 else
                 {
                     // Enemy Palmon is already defeated and can not attack anymore
-                    print("You defeated the Enemies Palmon " +enemyPalmon.getName()+ "! Congrats on that, it can not attack anymore :(");
+                    print("You defeated the Enemies Palmon " +enemyPalmon.getName()+ "! Congrats on that, it can not attack anymore");
                 }
             }
             else
             {
                 // Enemy starts attacking
-                print("The enemies Palmon " +enemyPalmon.getName()+ " is about to attack! Prepare yourself.");
+                print("\nThe enemies Palmon " +enemyPalmon.getName()+ " is about to attack! Prepare yourself.");
                 playerPalmon = attackingSequence(enemyPalmon, enemyMove, playerPalmon, enemiesPalMoves, enemyMoveIndex);
 
                 if(playerPalmon.getHp() > 0)
@@ -89,7 +90,7 @@ public class Fight extends Printing
                 }
             }
 
-            print("The " +round+ ". round is about to end! \nHere are the current stats...");
+            print("\nThe " +round+ ". round is about to end! \nHere are the current stats...");
             print("\nPlayers stats: \nCurrent Palmon fighting: " +playerPalmon.getName()+ " with " +playerPalmon.getHp()+ " HP left.");
             print("\nEnemy stats: \nCurrent Palmon fighting: " +enemyPalmon.getName()+ " with " +enemyPalmon.getHp()+ " HP left.");
 
@@ -177,7 +178,7 @@ public class Fight extends Printing
     }
 
     // Output: playerAttack (Players Move)
-    public Move chooseMovePlayer(Palmon playerPalmon, HashMap<Integer, ArrayList<Move>> playersPalMoves)
+    public Move chooseMovePlayer(Palmon playerPalmon, Palmon enemyPalmon, HashMap<Integer, ArrayList<Move>> playersPalMoves)
     {
         // telling the Player where he currently is
         print("It's time to choose a Move for your Palmon, " +InitialMenu.playerName);
@@ -205,22 +206,34 @@ public class Fight extends Printing
 
         while(!moveFound)
         {
-            choice = printssc("Please type in the name of your preferred Move", choice); // letting the Player choose a Move
+            choice = printssc("\nPlease type in the name of your preferred Move \n(i) Info of the currently battling Palmons", choice); // letting the Player choose a Move
 
-            // Finding the correct Move based on the player's choice
-            for (int i = 0; i < playersMoves.size(); i++)
+            if(choice.equals("i"))
             {
-                Move move = playersMoves.get(i);
-                String moveName = move.getName();
+                print("\nCurrent Stats from Palmon " +playerPalmon.getName()+ " (Palmon from " +InitialMenu.playerName+ ")");
+                print("heigt: " +playerPalmon.getHeight()+ "\nweight: " +playerPalmon.getWeight()+ "\ntypes: " +playerPalmon.getTypeOne()+ " " +playerPalmon.getTypeTwo()+ "\nHP left: " +playerPalmon.getHp()+ "\nattack: " +playerPalmon.getAttack()+ "\ndefense: " +playerPalmon.getDefense()+ "\nspeed: " +playerPalmon.getSpeed());
 
-                if (moveName.equals(choice))
+                print("\nCurrent Stats from Palmon " +enemyPalmon.getName()+ " (Palmon from " +InitialMenu.enemyName+ ")");
+                print("heigt: " +enemyPalmon.getHeight()+ "\nweight: " +enemyPalmon.getWeight()+ "\ntypes: " +enemyPalmon.getTypeOne()+ " " +enemyPalmon.getTypeTwo()+ "\nHP left: " +enemyPalmon.getHp()+ "\nattack: " +enemyPalmon.getAttack()+ "\ndefense: " +enemyPalmon.getDefense()+ "\nspeed: " +enemyPalmon.getSpeed());
+            }
+            else
+            {
+                // Finding the correct Move based on the player's choice
+                for (int i = 0; i < playersMoves.size(); i++)
                 {
-                    playerAttack = move; // save the selected Move
-                    playerMoveIndex = i; // Save the index of the selected Move
-                    moveFound = true;
-                    break; // Exit the loop once the Move is found
+                    Move move = playersMoves.get(i);
+                    String moveName = move.getName();
+
+                    if (moveName.equals(choice))
+                    {
+                        playerAttack = move; // save the selected Move
+                        playerMoveIndex = i; // Save the index of the selected Move
+                        moveFound = true;
+                        break; // Exit the loop once the Move is found
+                    }
                 }
-                else
+
+                if(playerAttack == null)
                 {
                     print("Your chosen Move was not found. Type in again.");
                 }
@@ -231,7 +244,7 @@ public class Fight extends Printing
         if(playerAttack.usagesLeft() <= 0) // if selected Move is already on Max Usages this will be needed
         {
            print("This Move is not usable anymore. You used it too often. Please choose a different Move");
-           chooseMovePlayer(playerPalmon, playersPalMoves);
+           chooseMovePlayer(playerPalmon, enemyPalmon, playersPalMoves);
         }
         // saving the Index of the Move to update the Max Usages when using the Move
         return playerAttack;
@@ -266,7 +279,6 @@ public class Fight extends Printing
                 {
                     oldDamageFactor = effectivity.getDamageFactor(); // overwrite the old Effectivity
                 }
-
             }
         }
 

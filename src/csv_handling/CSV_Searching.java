@@ -1,13 +1,13 @@
 package csv_handling;
 
 import data_structures.MultiHashMap;
+import elements.ConPalmonMove;
 import elements.Move;
 import elements.Palmon;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet; // for saving all types since HashSet does not save duplicates
-import java.util.List;
 
 public class CSV_Searching extends Thread
 {
@@ -163,24 +163,79 @@ public class CSV_Searching extends Thread
     }
 
     // collects all Moves for the Palmon given (int id) and puts them into an ArrayList
-    public ArrayList<Move> assembleMovesOnlyForPalmon(int id, CSV_Reader data)
+    public ArrayList<Move> assembleMovesOnlyForPalmon(int id, CSV_Reader data, boolean includeLevel)
     {
-        //TODO Working?
         ArrayList<Move> palmon_move = new ArrayList<>(); // the possible Moves for the Palmon will be saved in here
-        MultiHashMap<Integer, Move> palsMoves = CSV_Reader.palsMoves; // "importing" the MultiHashMap with all the Palmon IDs and the possible Moves
+        ArrayList <ConPalmonMove> palsMoves = CSV_Reader.palsMoves; // "importing" the MultiHashMap with all the Palmon IDs and the possible Moves
 
-        // Retrieve the list of ConPalmonMove objects associated with the Palmon ID
-        List<Move> palmonMoves = palsMoves.get(id);
+        Palmon palmon = CSV_Reader.palmon_db.get(id); // saving the current Palmon
+
+        boolean putInQueue;
+        Move currentMove;
 
             // Iterate over each ConPalmonMove object for the Palmon ID
-            for (Move palMove : palmonMoves)
+            for (ConPalmonMove palMove : palsMoves)
             {
-                if(palMove != null)
+                if(palMove.getPalmon().getId() == id)
                 {
-                    // Add the Move object to the ArrayList
-                    palmon_move.add(palMove);
+                    putInQueue = true;
+
+                    if(includeLevel)
+                    {
+                        if(palmon.getLevel() < palMove.getLevel())
+                        {
+                            putInQueue = false;
+                        }
+                    }
+
+                    if(putInQueue)
+                    {
+                        if(palMove.getMove() != null)
+                        {
+                            palmon_move.add(palMove.getMove());
+                        }
+                    }
                 }
             }
-        return palmon_move; // every possible Move for the Palmon
+
+        ArrayList<Move> fourStrongestMoves = assembleFourStrongestMoves(palmon_move);
+
+        return fourStrongestMoves; // every possible Move for the Palmon
+    }
+
+    public ArrayList<Move> assembleFourStrongestMoves(ArrayList<Move> palmon_move)
+    {
+        //TODO fix
+
+        ArrayList<Move> fourStrongestMoves = new ArrayList<>();
+        ArrayList<Move> tempPalmonMove = new ArrayList<>(palmon_move);
+
+        if(tempPalmonMove.size() <= 4) // if there are only less than 4 Moves possible to choose from, nothing has to be done
+        {
+            return tempPalmonMove;
+        }
+
+        // finding the Four strongest Moves by Damage (inspired by Selectionsort, I know its slow but since we only need 4 elements its not needed to sort the whole ArrayList)
+        for (int i = 0; i < 4; i++)
+        {
+            int maxIndex = 0;
+
+            // find the move with the maximum damage
+            for (int j = 1; j < tempPalmonMove.size(); j++)
+            {
+                if (tempPalmonMove.get(j).getDamage() > tempPalmonMove.get(maxIndex).getDamage())
+                {
+                    if (tempPalmonMove.get(j).getDamage() > tempPalmonMove.get(maxIndex).getDamage())
+                    {
+                        maxIndex = j;
+                    }
+                }
+            }
+
+            // add the move with the maximum damage to the ArrayList
+            fourStrongestMoves.add(tempPalmonMove.get(maxIndex));
+            tempPalmonMove.remove(maxIndex); // removing the move to find the next one with the highest damage
+        }
+        return fourStrongestMoves;
     }
 }

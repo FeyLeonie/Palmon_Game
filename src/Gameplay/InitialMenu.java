@@ -11,7 +11,7 @@ public class InitialMenu extends Thread
                                                     "██        ████████   ███       ███  ██   ██   ███     ███   ██   █████\n" +
                                                     "██       ███    ███  ████████  ███       ██    ████ █████   ██    ████\n" +
                                                     "██      ███      ███ ████████  ███       ██      █████      ██     ███\n";
-    static String language = "";
+    static int language = 0;
     static String playerName = "";
     static String enemyName;
     
@@ -26,7 +26,16 @@ public class InitialMenu extends Thread
     {
         print = new Printing();
 
-        language = print.printssc("Please choose your language. \n(1) English (default) \n(2) Deutsch", language);
+        do
+        {
+            language = print.printsc("Please choose your language. \n(1) English (default) \n(2) Deutsch", language);
+
+            if(language != 1 && language != 2)
+            {
+                print.print("Please type in (1) for yes and (2) for no.");
+            }
+        }
+        while(language != 1 && language != 2);
 
         print.print("\n" +palmon_logo);
         print.print("\nWelcome to Palmon, where every battle defines destiny. \nIn this arena, strength is the only language spoken, so prepare yourself for a hard fight! \nRise or fall, the choice is yours. Let the combat begin...");

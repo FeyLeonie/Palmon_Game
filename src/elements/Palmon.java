@@ -1,6 +1,6 @@
 package elements;
 
-public class Palmon // constructor
+public class Palmon
 {
     final int id;
     final String name;
@@ -11,9 +11,10 @@ public class Palmon // constructor
     final int attack;
     final int defense;
     final int speed;
+    int level;
 
     // Constructor
-    public Palmon (String [] palmondetails)
+    public Palmon (String [] palmondetails, int level)
     {
         id      = Integer.parseInt(palmondetails[0]);
         name    = palmondetails[1];
@@ -25,26 +26,22 @@ public class Palmon // constructor
         attack  = Integer.parseInt(palmondetails[7]);
         defense = Integer.parseInt(palmondetails[8]);
         speed   = Integer.parseInt(palmondetails[9]);
-    }
-
-    public int speed()
-    {
-        return speed;
-    }
-
-    public String getTypeOne()
-    {
-        return type[0];
-    }
-
-    public String getName()
-    {
-        return name;
+        this.level = level;
     }
 
     public int getId()
     {
         return id;
+    }
+
+    public int getSpeed()
+    {
+        return speed;
+    }
+
+    public String getName()
+    {
+        return name;
     }
 
     public String[] getTypes()
@@ -71,8 +68,38 @@ public class Palmon // constructor
         }
     }
 
+    public String getTypeOne()
+    {
+        return type[0];
+    }
+
+    public String getTypeTwo()
+    {
+        return type[1];
+    }
+
     public double getHp()
     {
         return hp;
+    }
+
+    public void assignLevel(int newLevel)
+    {
+        level = newLevel;
+    }
+
+    public int getLevel()
+    {
+        return level;
+    }
+
+    public int getWeight()
+    {
+        return weight;
+    }
+
+    public int getHeight()
+    {
+        return height;
     }
 }

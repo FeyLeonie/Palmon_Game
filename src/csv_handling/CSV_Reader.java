@@ -15,18 +15,16 @@ import java.util.HashMap;
 public class CSV_Reader extends Thread
 {
     // Paths
-    final String path_palmon = "C://Users//Fey//IdeaProjects//AA_Latest_Palmon//src//csv_dateien//palmon.csv"; // Path Palmon
-    final String path_move = "C://Users//Fey//IdeaProjects//AA_Latest_Palmon//src//csv_dateien//moves.csv";
-    String path_effectivity  = "C://Users//Fey//IdeaProjects//AA_Latest_Palmon//src//csv_dateien//effectivity.csv";
-    final String path_palmonmove = "C://Users//Fey//IdeaProjects//AA_Latest_Palmon//src//csv_dateien//palmon_move.csv";
+    final String path_palmon = "/Users/i589533/IdeaProjects/Palmon_Game_LatestOne_1705/src/csv_data/palmon.csv"; // Path Palmon
+    final String path_move = "/Users/i589533/IdeaProjects/Palmon_Game_LatestOne_1705/src/csv_data/moves.csv";
+    String path_effectivity  = "/Users/i589533/IdeaProjects/Palmon_Game_LatestOne_1705/src/csv_data/effectivity.csv";
+    final String path_palmonmove = "/Users/i589533/IdeaProjects/Palmon_Game_LatestOne_1705/src/csv_data/palmon_move.csv";
 
     // HashMaps
     public static HashMap <Integer, Palmon> palmon_db = new HashMap <>(); // Storage medium for Palmon, Key: ID
     public static HashMap<Integer, Move> move_db = new HashMap<>(); // Storage medium for Move, Key: ID
 
-    // own Data structure MultiHashMap
-    public static MultiHashMap<Integer, Move> palsMoves = new MultiHashMap<>(); // All Moves for the Palmon, Key: Palmon ID
-    public MultiHashMap<Move, Integer> movesForPals = new MultiHashMap<>(); // All Moves listed with further information out of CSV PalmonMove, Key: Move ID
+    public static ArrayList <ConPalmonMove> palsMoves = new ArrayList<>(); // Connection Palmon and its Move (incl. level)
 
     // ArrayLists
     public static ArrayList<Effectivity> effectivity_db  = new ArrayList <>(); // Storage medium for Effectivity
@@ -37,7 +35,7 @@ public class CSV_Reader extends Thread
         CSV_Reader reader = new CSV_Reader();
         reader.PalmonDataReader();
         reader.MoveDataReader();
-        // reader.PalmonMoveDataReader();
+        reader.PalmonMoveDataReader();
         reader.EffectivityDataReader();
     }
 
@@ -61,7 +59,7 @@ public class CSV_Reader extends Thread
                 {
                     String [] palmondetails = dataset.split(";");
 
-                    Palmon palmon = new Palmon(palmondetails);
+                    Palmon palmon = new Palmon(palmondetails, 0);
                     palmon_db.put(Integer.parseInt(palmondetails[0]), palmon);
                 }
             }
@@ -160,10 +158,12 @@ public class CSV_Reader extends Thread
         }
     }
 
+    //TODO das hier ist noch nicht ganz sauber
     public void PalmonMoveDataReader()
     {
         int palmonId;
         Move move;
+        Palmon palmon;
         int level;
 
         try (BufferedReader br = new BufferedReader(new FileReader(path_palmonmove)))
@@ -185,13 +185,13 @@ public class CSV_Reader extends Thread
                     String [] palmonMoveDetails = dataset.split(";"); // splitting the dataset into its pieces
 
                     palmonId = Integer.parseInt(palmonMoveDetails[0]);
+                    palmon = palmon_db.get(palmonId);
                     move = move_db.get(Integer.parseInt(palmonMoveDetails[1])); // searching for the correct move
                     level = Integer.parseInt(palmonMoveDetails[2]); // pre saving the level
 
-                    // ConPalmonMove conpalmonmove = new ConPalmonMove(palmon, move, level);
+                    ConPalmonMove conpalmonmove = new ConPalmonMove(palmon, move, level);
 
-                    palsMoves.put(palmonId, move); // MultiHashMap, Key Palmons
-                    movesForPals.put(move, palmonId); // HashMap, Key Moves
+                    palsMoves.add(conpalmonmove);
                 }
             }
         }

@@ -21,9 +21,14 @@ public class Move
         this.type = movedetails[5];
     }
 
-    public int getId()
+    public void useMove()
     {
-        return id;
+        this.usages+=1;
+    }
+
+    public int usagesLeft() {
+        int usagesLeft = max_usages - usages;
+        return usagesLeft;
     }
 
     public String getName()
@@ -39,16 +44,5 @@ public class Move
     public int getAccuracy()
     {
         return accuracy;
-    }
-
-    public void useMove()
-    {
-        this.usages+=1;
-    }
-
-    public int usagesLeft()
-    {
-        int usagesLeft = max_usages - usages;
-        return usagesLeft;
     }
 }

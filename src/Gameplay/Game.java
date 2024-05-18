@@ -64,7 +64,7 @@ public class Game extends Printing
 
             if(answer != 1 && answer != 2)
             {
-                print("Please type in (1) for yes and (2) for no.");
+                print("Please type in (1) for yes and (2) for noo.");
             }
         }
         while(answer != 1 && answer != 2);

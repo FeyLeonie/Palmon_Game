@@ -27,6 +27,7 @@ public class InitialMenu extends Thread
     {
         print = new Printing();
 
+        // O(n)
         do
         {
             language = print.printWithScInt("Please choose your language. \n(1) English (default) \n(2) Deutsch", language);
@@ -42,6 +43,7 @@ public class InitialMenu extends Thread
         print.print("\nWelcome to Palmon, where every battle defines destiny. \nIn this arena, strength is the only language spoken, so prepare yourself for a hard fight! \nRise or fall, the choice is yours. Let the combat begin...");
 
 
+        // O(n)
         while(playerName.equals(""))
         {
             playerName = print.printWithScString("\nWhat's your name, warrior?", playerName);
@@ -53,6 +55,7 @@ public class InitialMenu extends Thread
             }
         }
 
+        // O(n)
         while(enemyName.equals(""))
         {
             enemyName = print.printWithScString("\nPrepare to face your destiny, " +playerName + ". Whats the name of the opponent who dares to challenge you in the arena of Palmon?", enemyName);

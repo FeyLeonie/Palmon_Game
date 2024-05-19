@@ -1,5 +1,6 @@
 package Gameplay;
 
+import csv_handling.BattleDocumentation;
 import csv_handling.CSV_Reader;
 import data_structures.Normalizer;
 import data_structures.Printing;
@@ -8,7 +9,9 @@ import elements.Effectivity;
 import elements.Move;
 import elements.Palmon;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Random;
 
@@ -21,7 +24,8 @@ public class Fight extends Printing
     int playerMoveIndex = 0;
     int enemyMoveIndex = 0;
 
-    Queue <Palmon> playersDefeatedPalmons;
+    ArrayList<Palmon> playersPalmonssArr;
+    ArrayList<Palmon> enemiesPalmonssArr;
 
     public Fight(Game game, CSV_Reader data)
     {
@@ -36,7 +40,9 @@ public class Fight extends Printing
         // Introducing the Fight
         print("Welcome to the arena, " + InitialMenu.playerName + ". Prepare to fight against " + InitialMenu.enemyName + ". May the best Palmon Team win!");
 
-        playersDefeatedPalmons = new Queue<>();
+        // initializing the Queues where the defeated Palmons will be saved in
+        playersPalmonssArr = playerPalmons.toArrayList();
+        enemiesPalmonssArr = enemyPalmons.toArrayList();
 
         Palmon playerPalmon = playerPalmons.dequeue(); // load first Palmon into the Fight
         Palmon enemyPalmon = enemyPalmons.dequeue(); // load first Palmon into the Fight
@@ -103,10 +109,9 @@ public class Fight extends Printing
 
             if(playerPalmon.getHp() <= 0) // if Palmon is defeated
             {
-                playersDefeatedPalmons.enqueue(playerPalmon);
                 if(playerPalmons.getQueueSize() == 0) // and if theres no Palmon in the Players Queue anymore
                 {
-                    playerLost(); // the Player Lost
+                    playerLost(round, playersPalmonssArr, enemiesPalmonssArr); // the Player Lost
                     break;
                 }
                 playerPalmon = playerPalmons.dequeue(); // otherwise: load next Palmon into fight
@@ -116,7 +121,7 @@ public class Fight extends Printing
             {
                 if(enemyPalmons.getQueueSize() == 0)// and if theres no Palmon in the Enemies Queue anymore
                 {
-                    playerWon(playerPalmons, playerPalmon); // the Player won !!! (Glückwunsch Sebastiaaaan!!)
+                    playerWon(round, playersPalmonssArr, enemiesPalmonssArr); // the Player won !!! (Glückwunsch Sebastiaaaan!!)
                     break;
                 }
                 enemyPalmon = enemyPalmons.dequeue(); // otherwise: load next Palmon into fight
@@ -316,31 +321,69 @@ public class Fight extends Printing
         return hits;
     }
 
-    public void playerWon(Queue<Palmon> playerPalmons, Palmon playerPalmon)
+    //TODO wrong
+    public void playerWon(int round, ArrayList<Palmon> playersPalmonssArr, ArrayList<Palmon> enemiesPalmonssArr)
     {
+        // Copying the Palmons into an ArrayList for the CSV Battle Log in the end
+        ArrayList <String> playerPalmons = new ArrayList<>();
+        ArrayList <String> enemyPalmons = new ArrayList<>();
+
+        // putting every Palmon Name in both ArrayLists
+        for(Palmon pPalmon: playersPalmonssArr)
+        {
+            playerPalmons.add(Normalizer.normalize(pPalmon.getName()));
+        }
+
+        for(Palmon ePalmon: enemiesPalmonssArr)
+        {
+            enemyPalmons.add(Normalizer.normalize(ePalmon.getName()));
+        }
+
         print("You won! CONGRATULATIONS! Here are the names of your Palmons that supported you...");
 
-        while(playerPalmons.getQueueSize() != 0) // Printing out the Palmons that were in the Players team but didnt fight
-        {
-            System.out.println(Normalizer.normalize(playerPalmons.showTop().getName())); // printing out the Palmon
-            playerPalmons.dequeue(); // Pushing the Palmon out of the Stack
-        }
+        // creating an entry in Battle Log
+        BattleDocumentation.initializeLogFile();
+        BattleDocumentation.logBattle(round, InitialMenu.playerName, playerPalmons, InitialMenu.enemyName, enemyPalmons, "Player Won");
 
-        if(playerPalmon != null) // Printing out the Palmon that was in the last fight
-        {
-            System.out.println(Normalizer.normalize(playerPalmon.getName()));
-        }
+        String input = "";
+        input = printWithScString("(i) see battle log \n(type in anything else) end game", input);
 
-        print("And not to forget about the Palmons that went at their limit to help you. The ones who got defeated...");
-        while(playersDefeatedPalmons.getQueueSize() != 0) // Printing out the defeated Palmons
+        if(input.equals("i"))
         {
-            System.out.println(Normalizer.normalize(playersDefeatedPalmons.showTop().getName()));
-            playersDefeatedPalmons.dequeue();
+            BattleDocumentation.printBattleLog();
         }
     }
 
-    public void playerLost()
+    public void playerLost(int round, ArrayList<Palmon> playersPalmonssArr, ArrayList<Palmon> enemiesPalmonssArr)
     {
+        // Copying the Palmons into an ArrayList for the CSV Battle Log in the end
+        ArrayList <String> playerPalmons = new ArrayList<>();
+        ArrayList <String> enemyPalmons = new ArrayList<>();
+
+        // putting every Palmon Name in both ArrayLists
+        for(Palmon pPalmon: playersPalmonssArr)
+        {
+            playerPalmons.add(Normalizer.normalize(pPalmon.getName()));
+        }
+
+        for(Palmon ePalmon: enemiesPalmonssArr)
+        {
+            enemyPalmons.add(Normalizer.normalize(ePalmon.getName()));
+        }
+
+        // comforting the User
         print("You sadly lost, sorry for that :( But dont be sad, I´m sure you´ll win next round, try again!");
+
+        // creating an entry in Battle Log
+        BattleDocumentation.initializeLogFile();
+        BattleDocumentation.logBattle(round, InitialMenu.playerName, playerPalmons, InitialMenu.enemyName, enemyPalmons, "Player Lost");
+
+        String input = "";
+        input = printWithScString("(i) see battle log \n(type in anything else) end game", input);
+
+        if(input.equals("i"))
+        {
+            BattleDocumentation.printBattleLog();
+        }
     }
 }

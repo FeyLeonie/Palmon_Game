@@ -171,6 +171,7 @@ public class Game extends Printing
         int randomLevel;
         Palmon randomPalmon;
 
+        // O(n)
         for(int i = 0; i < teamsize; i++)
         {
 

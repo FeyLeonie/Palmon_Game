@@ -59,21 +59,6 @@ public class Queue<T>
         return data;						//Wert von altem Head zurückgeben
     }
 
-    //Complexity O(n)
-    public void printQueue()
-    {
-        Node<T> current = head;
-
-        while(current != null)
-        {
-
-            System.out.println(current.data);
-
-            current = current.next;			//wichtig!
-
-        }
-    }
-
     public int getQueueSize() // for returning the size of the Queue at any time
     {
         return queueSize;

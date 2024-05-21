@@ -1,21 +1,24 @@
 package csv_handling;
 
-import data_structures.Normalizer;
-import elements.Palmon;
-
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-//TODO TRY CATCH??
-// kommentieren!
-
+/**
+ * The BattleDocumentation class is responsible for managing the battle log,
+ * including initializing the log file, adding entries, and printing the log.
+ */
 public class BattleDocumentation
 {
     static final String fileName = "battleLog.csv"; // name of the CSV
     static int battleCount = 0; // battle count, +1 for each round played and saved
 
-    // checks if the file exists and creates it if needed
+    /**
+     * Checks if the log file exists and creates it if needed.
+     * It also counts the number of battles recorded in the file.
+     *
+     * software complexity is O(n)
+     */
     public static void initializeLogFile() {
         File file = new File(fileName);
 
@@ -49,7 +52,18 @@ public class BattleDocumentation
         }
     }
 
-    // adding a new entry to the BattleLog File
+    /**
+     * Adds a new entry to the BattleLog file.
+     *
+     * @param totalRounds The total number of rounds played in the battle.
+     * @param playerName The name of the player.
+     * @param playerTeam The team of the player.
+     * @param enemyName The name of the enemy.
+     * @param enemyTeam The team of the enemy.
+     * @param outcome The outcome of the battle.
+     *
+     * software complexity is O(1)
+     */
     public static void logBattle(int totalRounds, String playerName, ArrayList<String> playerTeam, String enemyName, ArrayList<String> enemyTeam, String outcome) {
         battleCount++; // increasing the battleCount by one since another round was played
 
@@ -66,7 +80,14 @@ public class BattleDocumentation
         }
     }
 
-    // Helper method to convert an ArrayList of Palmon objects to a CSV-friendly string
+    /**
+     * Converts an ArrayList of strings to a CSV-friendly string.
+     *
+     * @param convertingList The ArrayList to be converted.
+     * @return A string representation of the ArrayList suitable for CSV.
+     *
+     * software complexity is O(n), where n is the number of elements in the ArrayList.
+     */
     public static String convertArrayList(ArrayList<String> convertingList) {
         StringBuilder output = new StringBuilder();
 
@@ -80,7 +101,11 @@ public class BattleDocumentation
         return output.toString();
     }
 
-    // Prints out the battle log for the user
+    /**
+     * Prints out the battle log for the user.
+     *
+     * software complexity is O(n), where n is the number of lines in the file.
+     */
     public static void printBattleLog() {
         try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
             String line;

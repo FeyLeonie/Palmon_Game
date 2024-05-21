@@ -8,15 +8,31 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet; // for saving all types since HashSet does not save duplicates
 
+/**
+ * This class provides methods to search and process CSV data for Palmons.
+ */
 public class CSV_Searching extends Thread
 {
     CSV_Reader data;
 
+    /**
+     * Constructor for the CSV_Searching class
+     *
+     * @param data The CSV_Reader instance holding the data
+     */
     public CSV_Searching(CSV_Reader data)
     {
         this.data = data;
     }
 
+    /**
+     * Saves all unique Palmon types in a HashSet to avoid duplicates
+     *
+     * @param data The CSV_Reader instance holding the data
+     * @return A HashSet containing all unique Palmon types
+     *
+     * Software runtime complexity is O(n)
+     */
     public HashSet<String> saveAllPalmonTypes(CSV_Reader data)
     {
         // HashSet to store all possible types
@@ -30,6 +46,15 @@ public class CSV_Searching extends Thread
         return types;
     }
 
+    /**
+     * Sorts Palmons by their primary type.
+     *
+     * @param preferred_type The preferred type to sort by.
+     * @param data The CSV_Reader instance holding the data.
+     * @return A HashMap containing Palmons of the preferred type.
+     *
+     * Software runtime complexity is O(n)
+     */
     public HashMap<String, Palmon> sortByPalmonType(String preferred_type, CSV_Reader data)
     {
         HashMap<Integer, Palmon> palmon_db = CSV_Reader.palmon_db;
@@ -55,8 +80,10 @@ public class CSV_Searching extends Thread
 
         String type;
 
-        for (Palmon palmon : palmon_db.values()) {
-            if (palmon != null) {
+        for (Palmon palmon : palmon_db.values())
+        {
+            if (palmon != null)
+            {
                 type = palmon.getTypeOne();
 
                 switch (type) {
@@ -157,20 +184,28 @@ public class CSV_Searching extends Thread
                 return type1_fire;
             default:
                 System.out.println("no type found.");
-                return new HashMap<>(); // Falls der Type nicht gefunden wird, wird eine leere HashMap zurückgegeben
+                return new HashMap<>(); // if no type was found, an empty HashMap will be returned
         }
     }
 
-    // collects all Moves for the Palmon given (int id) and puts them into an ArrayList
+    /**
+     * Collects all possible moves for a given Palmon and returns the four strongest ones.
+     *
+     * @param id The ID of the Palmon.
+     * @param data The CSV_Reader instance holding the data.
+     * @param includeLevel Whether to include moves based on the Palmon's level.
+     * @return An ArrayList of the four strongest moves for the Palmon.
+     *
+     * Software runtime complexity is O(n).
+     */
     public ArrayList<Move> assembleMovesOnlyForPalmon(int id, CSV_Reader data, boolean includeLevel)
     {
         ArrayList<Move> palmon_move = new ArrayList<>(); // the possible Moves for the Palmon will be saved in here
         ArrayList <ConPalmonMove> palsMoves = CSV_Reader.palsMoves; // "importing" the MultiHashMap with all the Palmon IDs and the possible Moves
 
-        Palmon palmon = CSV_Reader.palmon_db.get(id); // saving the current Palmon
+        Palmon palmon = CSV_Reader.palmon_usage.get(id); // saving the current Palmon
 
         boolean putInQueue;
-        Move currentMove;
 
             // Iterate over each ConPalmonMove object for the Palmon ID
             for (ConPalmonMove palMove : palsMoves)
@@ -202,10 +237,17 @@ public class CSV_Searching extends Thread
         return fourStrongestMoves; // every possible Move for the Palmon
     }
 
+    /**
+     * Selects the four strongest moves from a list of moves
+     *
+     * @param palmon_move list of moves
+     *
+     * @return A list of the four strongest moves
+     *
+     * software runtime complexity is O(n)
+     */
     public ArrayList<Move> assembleFourStrongestMoves(ArrayList<Move> palmon_move)
     {
-        //TODO fix
-
         ArrayList<Move> fourStrongestMoves = new ArrayList<>();
         ArrayList<Move> tempPalmonMove = new ArrayList<>(palmon_move);
 

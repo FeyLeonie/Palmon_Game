@@ -1,5 +1,8 @@
 package elements;
 
+/**
+ * Represents a Palmon entity with attributes and behaviors.
+ */
 public class Palmon
 {
     final int id;
@@ -13,7 +16,12 @@ public class Palmon
     final int speed;
     int level;
 
-    // Constructor
+    /**
+     * Constructor to initialize a Palmon object with the given details.
+     *
+     * @param palmondetails An array containing Palmon details.
+     * @param level         The level of the Palmon.
+     */
     public Palmon (String [] palmondetails, int level)
     {
         id      = Integer.parseInt(palmondetails[0]);
@@ -29,36 +37,83 @@ public class Palmon
         this.level = level;
     }
 
+    /**
+     * gets the ID of the Palmon.
+     *
+     * @return The ID of the Palmon.
+     *
+     * Software runtime complexity is O(1)
+     */
     public int getId()
     {
         return id;
     }
 
+    /**
+     * gets the Speed of the Palmon.
+     *
+     * @return The speed of the Palmon.
+     *
+     * Software runtime complexity is O(1)
+     */
     public int getSpeed()
     {
         return speed;
     }
 
+    /**
+     * gets the name of the Palmon.
+     *
+     * @return The name of the Palmon.
+     *
+     * Software runtime complexity is O(1)
+     */
     public String getName()
     {
         return name;
     }
 
+    /**
+     * gets the Types of the Palmon.
+     *
+     * @return The types (Array) of the Palmon.
+     *
+     * Software runtime complexity is O(1)
+     */
     public String[] getTypes()
     {
         return type;
     }
 
+    /**
+     * gets the attack damage of the Palmon.
+     *
+     * @return The attack of the Palmon.
+     *
+     * Software runtime complexity is O(1)
+     */
     public int getAttack()
     {
         return attack;
     }
 
+    /**
+     * gets the defense of the Palmon.
+     *
+     * @return The defense of the Palmon.
+     *
+     * Software runtime complexity is O(1)
+     */
     public int getDefense()
     {
         return defense;
     }
 
+    /**
+     * adjusts the HP of the Palmon.
+     *
+     * Software runtime complexity is O(1)
+     */
     public void adjustHp(double damage)
     {
         hp = hp - damage;
@@ -68,36 +123,83 @@ public class Palmon
         }
     }
 
+    /**
+     * gets the first Type of the Palmon.
+     *
+     * @return The first Type of the Palmon.
+     *
+     * Software runtime complexity is O(1)
+     */
     public String getTypeOne()
     {
         return type[0];
     }
 
+    /**
+     * gets the second Type of the Palmon.
+     *
+     * @return The second Type of the Palmon.
+     *
+     * Software runtime complexity is O(1)
+     */
     public String getTypeTwo()
     {
         return type[1];
     }
 
+    /**
+     * gets the HP of the Palmon.
+     *
+     * @return The HP of the Palmon.
+     *
+     * Software runtime complexity is O(1)
+     */
     public double getHp()
     {
         return hp;
     }
 
+    /**
+     * updates the Level of the Palmon
+     *
+     * Software runtime complexity is O(1)
+     */
     public void assignLevel(int newLevel)
     {
         level = newLevel;
     }
 
+    /**
+     * gets the Level of the Palmon.
+     *
+     * @return The Level of the Palmon.
+     *
+     * Software runtime complexity is O(1)
+     */
     public int getLevel()
     {
         return level;
     }
 
+    /**
+     * gets the weight of the Palmon.
+     *
+     * @return The weight of the Palmon.
+     *
+     * Software runtime complexity is O(1)
+     */
     public int getWeight()
     {
         return weight;
     }
 
+    /**
+     * gets the height of the Palmon.
+     *
+     * @return The height of the Palmon.
+     *
+     * Software runtime complexity is O(1)
+     */
     public int getHeight()
     {
         return height;

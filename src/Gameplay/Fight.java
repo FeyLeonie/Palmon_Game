@@ -2,19 +2,21 @@ package Gameplay;
 
 import csv_handling.BattleDocumentation;
 import csv_handling.CSV_Reader;
-import data_structures.Normalizer;
-import data_structures.Printing;
+import tools.Normalizer;
+import tools.Printing;
 import data_structures.Queue;
 import elements.Effectivity;
 import elements.Move;
 import elements.Palmon;
+import tools.ThreadSleep;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Random;
 
+/**
+ * Represents the fight between the Player and the Enemy
+ */
 public class Fight extends Printing
 {
     public Game game;
@@ -27,18 +29,36 @@ public class Fight extends Printing
     ArrayList<Palmon> playersPalmonssArr;
     ArrayList<Palmon> enemiesPalmonssArr;
 
+    /**
+     * Initializes a new Fight instance.
+     *
+     * @param game The game instance.
+     * @param data The CSV reader instance.
+     */
     public Fight(Game game, CSV_Reader data)
     {
         this.game = game;
         this.data = data;
     }
 
-
     int round = 0;
+
+    /**
+     * Provides an overview of the fight between two players.
+     *
+     * @param playerPalmons   The queue of Palmons for the player.
+     * @param enemyPalmons    The queue of Palmons for the enemy.
+     * @param enemiesPalMoves The map containing moves for enemy Palmons.
+     * @param playersPalMoves The map containing moves for player Palmons.
+     *
+     * Software Runtime Complexity is O(n)
+     */
     public void FightOverview(Queue<Palmon> playerPalmons, Queue<Palmon> enemyPalmons, HashMap<Integer, ArrayList<Move>> enemiesPalMoves, HashMap<Integer, ArrayList<Move>> playersPalMoves)
     {
         // Introducing the Fight
-        print("Welcome to the arena, " + InitialMenu.playerName + ". Prepare to fight against " + InitialMenu.enemyName + ". May the best Palmon Team win!");
+        print("Welcome to the arena, " + InitialMenu.playerName + ". Prepare to fight against " + InitialMenu.enemyName);
+        ThreadSleep.sleep(1000);
+        print("May the best Palmon win.");
 
         // initializing the Queues where the defeated Palmons will be saved in
         playersPalmonssArr = playerPalmons.toArrayList();
@@ -54,58 +74,111 @@ public class Fight extends Printing
         {
             playerPalmonName = Normalizer.normalize(playerPalmonName);
             enemyPalmonName = Normalizer.normalize(enemyPalmonName);
+            ThreadSleep.sleep(1000);
 
             round++;
             print("\nThe " +round+ ". round is about to start!");
+            ThreadSleep.sleep(1000);
 
-            //TODO Palmons NULL
             print("The Palmons are in the arena and ready.");
-            print(playerPalmonName+ ", the Palmon from " +InitialMenu.playerName+" faces off against " +enemyPalmonName+ ", the Palmon from " +InitialMenu.enemyName+ ". Let the battle begin!\n");
+            ThreadSleep.sleep(2000);
 
-            // TODO ab hier gibt es eine Exception beim Starten mit Threading
+            print(playerPalmonName+ ", the Palmon from " +InitialMenu.playerName+" faces off against " +enemyPalmonName+ ", the Palmon from " +InitialMenu.enemyName+ ". Let the battle begin!\n");
+            ThreadSleep.sleep(2000);
+
             Move enemyMove = chooseMoveEnemy(enemyPalmon, enemiesPalMoves);
             Move playerMove = chooseMovePlayer(playerPalmon, enemyPalmon, playersPalMoves);
 
-            if(playerPalmon.getSpeed() >= enemyPalmon.getSpeed())
-            {
-                //Player starts attacking
-                print("\nYour Palmon " +playerPalmonName+ " is about to attack the Enemies Palmon " +enemyPalmonName+ "! Ready to rumble?");
-                enemyPalmon = attackingSequence(playerPalmon, playerMove, enemyPalmon, playersPalMoves, playerMoveIndex);
+            ThreadSleep.sleep(1000);
 
-                if(enemyPalmon.getHp() > 0)
-                {
-                    // Enemy starts attacking
-                    print("\nThe enemies Palmon " +enemyPalmonName+ " is about to attack your Palmon " +playerPalmonName+ "! Prepare yourself.");
-                    playerPalmon = attackingSequence(enemyPalmon, enemyMove, playerPalmon, enemiesPalMoves, enemyMoveIndex);
-                }
-                else
-                {
-                    // Enemy Palmon is already defeated and can not attack anymore
-                    print("You defeated the Enemies Palmon " +enemyPalmonName+ "! Congrats on that, it can not attack anymore");
-                }
+            if(enemyMove == null && playerMove == null)
+            {
+                print("Both Palmons " +Normalizer.normalize(playerPalmon.getName())+ " and " +Normalizer.normalize(enemyPalmon.getName())+ " are blocked since they dont have a Move. They will be defeated.");
+                playerPalmon.adjustHp(10000.0);
+                enemyPalmon.adjustHp(10000.0);
             }
             else
             {
-                // Enemy starts attacking
-                print("\nThe enemies Palmon " +enemyPalmonName+ " is about to attack! Prepare yourself.");
-                playerPalmon = attackingSequence(enemyPalmon, enemyMove, playerPalmon, enemiesPalMoves, enemyMoveIndex);
-
-                if(playerPalmon.getHp() > 0)
+                if(playerPalmon.getSpeed() >= enemyPalmon.getSpeed())
                 {
                     //Player starts attacking
-                    print("Your Palmon " +playerPalmonName+ " is about to attack! Ready to rumble?");
+                    ThreadSleep.sleep(1000);
+                    print("\nYour Palmon " +playerPalmonName+ " is about to attack " +enemyPalmonName+ ", the Palmon from " +InitialMenu.enemyName+ "!");
                     enemyPalmon = attackingSequence(playerPalmon, playerMove, enemyPalmon, playersPalMoves, playerMoveIndex);
+
+                    if(enemyPalmon.getHp() > 0)
+                    {
+                        ThreadSleep.sleep(1000);
+                        // Enemy starts attacking
+                        print("\nThe Palmon " +enemyPalmonName+ " from " +InitialMenu.enemyName+ " is about to attack your Palmon " +playerPalmonName+ "!");
+                        playerPalmon = attackingSequence(enemyPalmon, enemyMove, playerPalmon, enemiesPalMoves, enemyMoveIndex);
+                    }
+                    else
+                    {
+                        ThreadSleep.sleep(1000);
+                        // Enemy Palmon is already defeated and can not attack anymore
+                        print("You defeated the Palmon " +enemyPalmonName+ " from " +InitialMenu.enemyName+ "!");
+                    }
                 }
                 else
                 {
-                    // Player Palmon is already defeated and can not attack anymore
-                    print("Your Palmon " +playerPalmonName+ " got defeated by " +enemyPalmonName+ ". It can not attack anymore :(");
+                    ThreadSleep.sleep(1000);
+                    // Enemy starts attacking
+                    print("\nThe enemies Palmon " +enemyPalmonName+ " is about to attack! Prepare yourself.");
+                    playerPalmon = attackingSequence(enemyPalmon, enemyMove, playerPalmon, enemiesPalMoves, enemyMoveIndex);
+
+                    if(playerPalmon.getHp() > 0)
+                    {
+                        ThreadSleep.sleep(1000);
+                        //Player starts attacking
+                        print("Your Palmon " +playerPalmonName+ " is about to attack! Ready to rumble?");
+                        enemyPalmon = attackingSequence(playerPalmon, playerMove, enemyPalmon, playersPalMoves, playerMoveIndex);
+                    }
+                    else
+                    {
+                        ThreadSleep.sleep(1000);
+                        // Player Palmon is already defeated and can not attack anymore
+                        print("Your Palmon " +playerPalmonName+ " got defeated by " +enemyPalmonName+ ". It can not attack anymore :(");
+                    }
                 }
             }
+            ThreadSleep.sleep(1);
+            String choice = "";
+            choice = printWithScString("\nThe " +round+ ". round is about to end! \n(i) Overview of the Palmons HP and teams (type anything else) start next round", choice);
 
-            print("\nThe " +round+ ". round is about to end! \nHere are the current stats...");
-            print("\nPlayers stats: \nCurrent Palmon fighting: " +playerPalmonName+ " with " +playerPalmon.getHp()+ " HP left.");
-            print("\nEnemy stats: \nCurrent Palmon fighting: " +enemyPalmonName+ " with " +enemyPalmon.getHp()+ " HP left.");
+            if(choice.equals("i"))
+            {
+                print("\nPlayers stats:");
+                ThreadSleep.sleep(500);
+                print("Current Palmon fighting: " +playerPalmonName+ " with " +playerPalmon.getHp()+ " HP left.");
+                ThreadSleep.sleep(500);
+                int palsLeft = 0;
+                if(playerPalmon.getHp() <= 0) // if current fighting Palmon is defeated
+                {
+                    palsLeft = playerPalmons.getQueueSize(); // current team size is the Queue size
+                }
+                else // if current Palmon still has some HP
+                {
+                    palsLeft = playerPalmons.getQueueSize() + 1; // teamsize is the current Palmon + Queuesize
+                }
+                print("Amount of Palmons left: " +palsLeft);
+
+                ThreadSleep.sleep(1000);
+
+                print("\nEnemy stats:");
+                ThreadSleep.sleep(500);
+                print("Current Palmon fighting: " +enemyPalmonName+ " with " +enemyPalmon.getHp()+ " HP left.");
+                ThreadSleep.sleep(500);
+                if(enemyPalmon.getHp() <= 0) // if current fighting Palmon is defeated
+                {
+                    palsLeft = enemyPalmons.getQueueSize(); // current team size is the Queue size
+                }
+                else // if current Palmon still has some HP
+                {
+                    palsLeft = enemyPalmons.getQueueSize() + 1; // teamsize is the current Palmon + Queuesize
+                }
+                print("Amount of Palmons left: " +palsLeft);
+            }
 
             if(playerPalmon.getHp() <= 0) // if Palmon is defeated
             {
@@ -114,6 +187,8 @@ public class Fight extends Printing
                     playerLost(round, playersPalmonssArr, enemiesPalmonssArr); // the Player Lost
                     break;
                 }
+                ThreadSleep.sleep(1000);
+                print("\nSince your Palmon " +Normalizer.normalize(playerPalmon.getName())+ " got defeated your next Palmon will take over the Arena now!");
                 playerPalmon = playerPalmons.dequeue(); // otherwise: load next Palmon into fight
             }
 
@@ -124,11 +199,28 @@ public class Fight extends Printing
                     playerWon(round, playersPalmonssArr, enemiesPalmonssArr); // the Player won !!! (Glückwunsch Sebastiaaaan!!)
                     break;
                 }
+                ThreadSleep.sleep(1000);
+                print("\nSince the Palmon " +Normalizer.normalize(playerPalmon.getName())+ " from " +InitialMenu.enemyName+ " got defeated the next Palmon will fight now!");
                 enemyPalmon = enemyPalmons.dequeue(); // otherwise: load next Palmon into fight
             }
+            ThreadSleep.sleep(1000);
         }
     }
 
+    /**
+     * Handles the attacking sequence between two Palmons.
+     *
+     * @param attacker        The attacking Palmon.
+     * @param defender        The defending Palmon.
+     *
+     * move            The move used by the attacking Palmon.
+     * palMoves        The map of moves available to the Palmon.
+     * moveIndex       The index of the move in the list.
+     *
+     * @return The updated defending Palmon after the attack.
+     *
+     * Software Runtime Complexity is O(1)
+     */
     public Palmon attackingSequence(Palmon attacker, Move attack, Palmon defender, HashMap<Integer, ArrayList<Move>> moveHashMap, int index)
     {
         // values are temporary
@@ -136,47 +228,71 @@ public class Fight extends Printing
         boolean hits = false;
         double damage = 0;
 
-        // Player starts
-        hits = setAccuracy(attack);
-
         String attackerName = Normalizer.normalize(attacker.getName());
         String defenderName = Normalizer.normalize(defender.getName());;
 
+        if(attack == null)
+        {
+            print("Palmon " +attackerName+ " is blocked. It is not able to perform any Move.");
+            return defender;
+        }
+
+        // Player starts
+        hits = setAccuracy(attack);
+
+        ThreadSleep.sleep(1000);
         print("Attack is about to happen! " +defenderName+ " currently has " +defender.getHp()+ " HP. Will " +attackerName+ " hit?");
+        ThreadSleep.sleep(2250);
 
-        if(hits)
-        {
-            damageFactor = getEffectivity(attacker, defender); // damage factor is calculated
-            damage = (attacker.getAttack() + attack.getDamage() - defender.getDefense()) * damageFactor; // attacking damage is calculated
-
-            if(damage > 0) // damage zero or below zero e.g. if Players defense is higher than the actual attack
+            if(hits)
             {
-                defender.adjustHp(damage); // adjusting the defenders HP
+                damageFactor = getEffectivity(attacker, defender); // damage factor is calculated
+                damage = (attacker.getAttack() + attack.getDamage() - defender.getDefense()) * damageFactor; // attacking damage is calculated
 
-                print("The hit was successful! " + attackerName+ " made " +damage+ " hp damage to " +defenderName);
-                print(defenderName+ " now has " +defender.getHp()+ " HP left.");
+                if(damage > 0) // damage zero or below zero e.g. if Players defense is higher than the actual attack
+                {
+                    defender.adjustHp(damage); // adjusting the defenders HP
+
+                    print("The hit was successful! " + attackerName+ " made " +damage+ " hp damage to " +defenderName);
+                    print(defenderName+ " now has " +defender.getHp()+ " HP left.");
+                }
             }
-        }
-        else
-        {
-            print(attackerName+ " didnt hit. Maybe next time");
-        }
+            else
+            {
+                print(attackerName+ " didnt hit. Maybe next time");
+            }
 
-        // Updating the Move usage by one
-        ArrayList<Move> moves = moveHashMap.get(attacker.getId());
-        Move move = moves.get(index);
-        move.useMove();
+            // Updating the Move usage by one
+            ArrayList<Move> moves = moveHashMap.get(attacker.getId());
+            Move move = moves.get(index);
+            move.useMove();
 
         return defender;
     }
 
-    //  Output: enemyAttack (Enemies Move)
+    /**
+     * Chooses a move for the enemy's Palmon.
+     *
+     * palmon  The enemy's Palmon.
+     * palMoves The map of moves available to the enemy's Palmon.
+     *
+     * @return The chosen move.
+     *
+     * Software Runtime Complexity is O(1)
+     */
     public Move chooseMoveEnemy(Palmon enemyPalmon, HashMap<Integer, ArrayList<Move>> enemiesPalMoves)
     {
         // Choose Random Move from Enemies Palmon
         ArrayList<Move> enemiesMoves = enemiesPalMoves.get(enemyPalmon.getId()); // saving the ArrayList with all the Moves of the current Palmon
 
+        if(enemiesMoves.isEmpty())
+        {
+            print("Palmon " +Normalizer.normalize(enemyPalmon.getName())+ " from " +InitialMenu.enemyName+ " is blocked since it does not have any Move to perform. Lucky on you!");
+            return null;
+        }
+
         Random r = new Random();
+        //TODO hier kommt es in ausnahmefällen noch zu einer Exception (siehe Eingabe Hannah)
         int randomMove = r.nextInt(enemiesMoves.size());
 
         Move enemyAttack = enemiesMoves.get(randomMove); // Saving the current Move
@@ -193,16 +309,37 @@ public class Fight extends Printing
         return enemyAttack;
     }
 
-    // Output: playerAttack (Players Move)
+
+    /**
+     * Chooses a move for the player's Palmon.
+     *
+     * @param playerPalmon The player's Palmon.
+     * @param enemyPalmon  The enemy's Palmon.
+     *
+     * palMoves he map of moves available to the player's Palmon.
+     *
+     * @return The chosen move.
+     *
+     * Software Runtime Complexity is O(1)
+     */
     public Move chooseMovePlayer(Palmon playerPalmon, Palmon enemyPalmon, HashMap<Integer, ArrayList<Move>> playersPalMoves)
     {
         // telling the Player where he currently is
+        ThreadSleep.sleep(500);
         print("It's time to choose a Move for your Palmon, " +InitialMenu.playerName);
+
+        ThreadSleep.sleep(1000);
 
         // Let the Player choose the preferred Move
         // saving the ArrayList with all the Moves of the current Palmon
         ArrayList<Move> playersMoves;
         playersMoves = playersPalMoves.get(playerPalmon.getId());
+
+        if(playersMoves.isEmpty())
+        {
+            print("Your Palmon is blocked since it does not have any Move to perform. :(");
+            return null;
+        }
 
         Move tempMove;
         // Printing out every Move the Player can choose from with its damage
@@ -213,9 +350,12 @@ public class Fight extends Printing
 
             if (tempMove != null)
             {
-                    print(tempMove.getName() + " with possible damage: " + tempMove.getDamage());
+                ThreadSleep.sleep(500);
+                print(Normalizer.normalize(tempMove.getName()) + " with possible damage: " + tempMove.getDamage());
             }
         }
+
+        ThreadSleep.sleep(2000);
 
         String choice = "";
         Move playerAttack = null;
@@ -228,11 +368,18 @@ public class Fight extends Printing
 
             if(choice.equals("i"))
             {
+                ThreadSleep.sleep(1000);
                 print("\nCurrent Stats from Palmon " +Normalizer.normalize(playerPalmon.getName())+ " (Palmon from " +InitialMenu.playerName+ ")");
+                ThreadSleep.sleep(500);
                 print("Heigt: " +playerPalmon.getHeight()+ "\nWeight: " +playerPalmon.getWeight()+ "\nTypes: " +Normalizer.normalize(playerPalmon.getTypeOne())+ " " +Normalizer.normalize(playerPalmon.getTypeTwo())+ "\nHP left: " +playerPalmon.getHp()+ "\nAttack: " +playerPalmon.getAttack()+ "\nDefense: " +playerPalmon.getDefense()+ "\nSpeed: " +playerPalmon.getSpeed());
 
+                ThreadSleep.sleep(2000);
+
                 print("\nCurrent Stats from Palmon " +Normalizer.normalize(enemyPalmon.getName())+ " (Palmon from " +InitialMenu.enemyName+ ")");
+                ThreadSleep.sleep(500);
                 print("Heigt: " +enemyPalmon.getHeight()+ "\nWeight: " +enemyPalmon.getWeight()+ "\nTypes: " +Normalizer.normalize(enemyPalmon.getTypeOne())+ " " +Normalizer.normalize(enemyPalmon.getTypeTwo())+ "\nHP left: " +enemyPalmon.getHp()+ "\nAttack: " +enemyPalmon.getAttack()+ "\nDefense: " +enemyPalmon.getDefense()+ "\nSpeed: " +enemyPalmon.getSpeed());
+
+                ThreadSleep.sleep(1000);
             }
             else
             {
@@ -247,12 +394,8 @@ public class Fight extends Printing
                         playerAttack = move; // save the selected Move
                         playerMoveIndex = i; // Save the index of the selected Move
                         moveFound = true;
-                        break; // Exit the loop once the Move is found
-                    }
-
-                    if(moveFound)
-                    {
                         print("You chose the Move " +playerAttack.getName());
+                        break; // Exit the loop once the Move is found
                     }
                 }
 
@@ -266,13 +409,23 @@ public class Fight extends Printing
 
         if(playerAttack.usagesLeft() <= 0) // if selected Move is already on Max Usages this will be needed
         {
-           print("The chosen Move " +Normalizer.normalize(playerAttack.getName())+ " is not usable anymore. You used it too often. Please choose a different Move");
+           print("The chosen Move " +Normalizer.normalize(playerAttack.getName())+ " is not usable anymore. You used it too often. \nPlease choose a different Move");
            chooseMovePlayer(playerPalmon, enemyPalmon, playersPalMoves);
         }
         // saving the Index of the Move to update the Max Usages when using the Move
         return playerAttack;
     }
 
+    /**
+     * Determines the effectivity of an attack from one Palmon to another based on their types.
+     *
+     * @param attacker The attacking Palmon.
+     * @param defender The defending Palmon.
+     *
+     * @return The smallest damage factor based on type effectivity.
+     *
+     * Software Runtime Complexity is O(n)
+     */
     public double getEffectivity(Palmon attacker, Palmon defender)
     {
         // Grundgedanke mal auf Deutsch:
@@ -308,6 +461,14 @@ public class Fight extends Printing
         return oldDamageFactor; // return smallest Effectivity
     }
 
+    /**
+     * Determines if a move hits based on its accuracy.
+     *
+     * @param move The move being used.
+     * @return True if the move hits, otherwise false.
+     *
+     * Software Runtime Complexity is O(1)
+     */
     public boolean setAccuracy(Move move)
     {
         boolean hits = false;
@@ -321,17 +482,30 @@ public class Fight extends Printing
         return hits;
     }
 
-    //TODO wrong
+    /**
+     * Handles the scenario when the player wins the battle.
+     *
+     * @param round             The round in which the player won.
+     * @param playersPalmonssArr The list of player's Palmons.
+     * @param enemiesPalmonssArr The list of enemy's Palmons.
+     *
+     * Software Runtime Complexity is O(n)
+     */
     public void playerWon(int round, ArrayList<Palmon> playersPalmonssArr, ArrayList<Palmon> enemiesPalmonssArr)
     {
         // Copying the Palmons into an ArrayList for the CSV Battle Log in the end
         ArrayList <String> playerPalmons = new ArrayList<>();
         ArrayList <String> enemyPalmons = new ArrayList<>();
 
+        print("You won! CONGRATULATIONS! Here are the names of your Palmons that supported you...");
+
         // putting every Palmon Name in both ArrayLists
         for(Palmon pPalmon: playersPalmonssArr)
         {
             playerPalmons.add(Normalizer.normalize(pPalmon.getName()));
+            // printing out the Players Palmons
+            ThreadSleep.sleep(500);
+            print(Normalizer.normalize(pPalmon.getName()));
         }
 
         for(Palmon ePalmon: enemiesPalmonssArr)
@@ -339,11 +513,11 @@ public class Fight extends Printing
             enemyPalmons.add(Normalizer.normalize(ePalmon.getName()));
         }
 
-        print("You won! CONGRATULATIONS! Here are the names of your Palmons that supported you...");
-
         // creating an entry in Battle Log
         BattleDocumentation.initializeLogFile();
         BattleDocumentation.logBattle(round, InitialMenu.playerName, playerPalmons, InitialMenu.enemyName, enemyPalmons, "Player Won");
+
+        ThreadSleep.sleep(1000);
 
         String input = "";
         input = printWithScString("(i) see battle log \n(type in anything else) end game", input);
@@ -354,6 +528,15 @@ public class Fight extends Printing
         }
     }
 
+    /**
+     * Prints the result and statistics when the player loses.
+     *
+     * @param round             The round number when the player lost.
+     * @param playersPalmonssArr The list of player's Palmons.
+     * @param enemiesPalmonssArr The list of enemy's Palmons.
+     *
+     * Software complexity is O(n)
+     */
     public void playerLost(int round, ArrayList<Palmon> playersPalmonssArr, ArrayList<Palmon> enemiesPalmonssArr)
     {
         // Copying the Palmons into an ArrayList for the CSV Battle Log in the end
@@ -372,7 +555,9 @@ public class Fight extends Printing
         }
 
         // comforting the User
-        print("You sadly lost, sorry for that :( But dont be sad, I´m sure you´ll win next round, try again!");
+        print("You sadly lost, sorry for that :( \nBut dont be sad, I´m sure you´ll win next round, try again!");
+
+        ThreadSleep.sleep(1000);
 
         // creating an entry in Battle Log
         BattleDocumentation.initializeLogFile();

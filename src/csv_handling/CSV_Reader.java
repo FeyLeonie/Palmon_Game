@@ -11,6 +11,10 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+/**
+ * The CSV_Reader class is responsible for reading CSV files and populating the data structures
+ * for Palmons, Moves, and their associated connections (ConPalmonMove) and Effectivities.
+ */
 public class CSV_Reader extends Thread implements CSV
 {
 
@@ -22,6 +26,7 @@ public class CSV_Reader extends Thread implements CSV
 
     // HashMaps
     public static HashMap <Integer, Palmon> palmon_db = new HashMap <>(); // Storage medium for Palmon, Key: ID
+    public static HashMap <Integer, Palmon> palmon_usage = new HashMap <>(); // Second storage Medium for Move assembling later on
     public static HashMap<Integer, Move> move_db = new HashMap<>(); // Storage medium for Move, Key: ID
 
     public static ArrayList <ConPalmonMove> palsMoves = new ArrayList<>(); // Connection Palmon and its Move (incl. level)
@@ -29,7 +34,10 @@ public class CSV_Reader extends Thread implements CSV
     // ArrayLists
     public static ArrayList<Effectivity> effectivity_db  = new ArrayList <>(); // Storage medium for Effectivity
 
-    // @Override
+    /**
+     * Overrides the run method to initiate reading of all CSV files.
+     */
+    @Override
     public void run()
     {
         CSV_Reader reader = new CSV_Reader();
@@ -39,6 +47,10 @@ public class CSV_Reader extends Thread implements CSV
         reader.EffectivityDataReader();
     }
 
+    /**
+     * Reads Palmon data from a CSV file and populates the palmon_db HashMap.
+     * software complexity is O(n)
+     */
     public void PalmonDataReader()
     {
         try (BufferedReader br = new BufferedReader(new FileReader(path_palmon)))
@@ -61,6 +73,7 @@ public class CSV_Reader extends Thread implements CSV
 
                     Palmon palmon = new Palmon(palmondetails, 0);
                     palmon_db.put(Integer.parseInt(palmondetails[0]), palmon);
+                    palmon_usage.put(Integer.parseInt(palmondetails[0]), palmon);
                 }
             }
         }
@@ -75,6 +88,10 @@ public class CSV_Reader extends Thread implements CSV
         }
     }
 
+    /**
+     * Reads Move data from the CSV file and populates the move_db HashMap.
+     * software complexity is O(n)
+     */
     public void MoveDataReader()
     {
         try (BufferedReader br = new BufferedReader(new FileReader(path_move)))
@@ -111,6 +128,10 @@ public class CSV_Reader extends Thread implements CSV
         }
     }
 
+    /**
+     * Reads Effectivity data from a CSV file and populates the effectivity_db ArrayList.
+     * software complexity is O(n)
+     */
     public void EffectivityDataReader()
     {
         try (BufferedReader br = new BufferedReader(new FileReader(path_effectivity))) // setting up the Buffered Reader
@@ -158,6 +179,10 @@ public class CSV_Reader extends Thread implements CSV
         }
     }
 
+    /**
+     * Reads Palmon-Move connections from a CSV file and populates the palsMoves ArrayList.
+     * software complexity is O(n)
+     */
     public void PalmonMoveDataReader()
     {
         int palmonId;

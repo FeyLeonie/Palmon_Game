@@ -1,32 +1,60 @@
 package elements;
 
+/**
+ * Represents an Effectivity entity with attributes and behaviors.
+ */
 public class Effectivity
 {
-        String attackerType;
-        String targetType;
-        double damage;
+    String attackerType;
+    String targetType;
+    double damage;
 
-        // Constructor for Effectivity
-        public Effectivity(String damage_type_id, String target_type_id, double damage_factor)
-        {
-            this.attackerType = damage_type_id;
-            this.targetType = target_type_id;
-            this.damage = damage_factor;
-        }
+    /**
+     * Constructor to initialize an Effectivity object with the given attributes
+     *
+     * @param attackerType  the type of the Palmon that is attacking
+     * @param targetType    the type of the Palmon that is defending itself
+     * @param damage        the damage factor for the attack
+     */
+    public Effectivity(String attackerType, String targetType, double damage)
+    {
+        this.attackerType = attackerType;
+        this.targetType = targetType;
+        this.damage = damage;
+    }
 
-        // get Methods for returning the needed Parameters
-
-        public String getAttackerType()
+    /**
+     * gets the Attacker Type
+     *
+     * @return The Attacker Type
+     *
+     * Software runtime complexity is O(1)
+     */
+    public String getAttackerType()
         {
             return attackerType;
         }
 
-        public String getTargetType()
+    /**
+     * gets the Target Type
+     *
+     * @return The Target Type
+     *
+     * Software runtime complexity is O(1)
+     */
+    public String getTargetType()
         {
             return targetType;
         }
 
-        public double getDamageFactor()
+    /**
+     * gets the Damage Type
+     *
+     * @return The Damage Type
+     *
+     * Software runtime complexity is O(1)
+     */
+    public double getDamageFactor()
         {
             return damage;
         }

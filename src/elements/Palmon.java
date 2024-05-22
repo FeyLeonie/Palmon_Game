@@ -116,7 +116,8 @@ public class Palmon
      */
     public void adjustHp(double damage)
     {
-        hp = hp - damage;
+        hp -= damage;
+
         if(hp < 0)
         {
             hp = 0;

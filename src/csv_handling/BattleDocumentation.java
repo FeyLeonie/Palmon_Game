@@ -1,5 +1,9 @@
 package csv_handling;
 
+import tools.Language;
+import tools.Printing;
+import tools.ThreadSleep;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -8,7 +12,7 @@ import java.util.Scanner;
  * The BattleDocumentation class is responsible for managing the battle log,
  * including initializing the log file, adding entries, and printing the log.
  */
-public class BattleDocumentation
+public class BattleDocumentation extends Printing
 {
     static final String fileName = "battleLog.csv"; // name of the CSV
     static int battleCount = 0; // battle count, +1 for each round played and saved
@@ -27,7 +31,7 @@ public class BattleDocumentation
             // create the file and add the header
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(file)))
             {
-                writer.write("Battle Number;Rounds played;Player;Player team;Enemy;Enemy Team;Outcome\n"); // Header
+                writer.write(Language.getMessage("BHeader")); // Header
             } catch (IOException e)
             {
                 System.err.println("Error while setting up the BattleLog file. " + e.getMessage());
@@ -106,12 +110,15 @@ public class BattleDocumentation
      *
      * software complexity is O(n), where n is the number of lines in the file.
      */
-    public static void printBattleLog() {
+    public static void printBattleLog()
+    {
+        Printing print = new Printing();
+
         try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
             String line;
             // Skip the header line
             reader.readLine();
-            System.out.println("Battle Log:");
+            System.out.println(Language.getMessage("BBattleLog"));
             while ((line = reader.readLine()) != null) {
                 // Split the line into columns
                 String[] columns = line.split(";");
@@ -126,14 +133,23 @@ public class BattleDocumentation
                 String outcome = columns[6];
 
                 // Print out the details
-                System.out.println("Battle Number: " + battleNumber);
-                System.out.println("Total Rounds: " + totalRounds);
-                System.out.println("Player Name: " + playerName);
-                System.out.println("Player Team: " + playerTeam);
-                System.out.println("Enemy Name: " + enemyName);
-                System.out.println("Enemy Team: " + enemyTeam);
-                System.out.println("Outcome: " + outcome);
-                System.out.println("------");
+                print.print("------");
+                print.print(Language.getMessage("BBattleNumber", battleNumber));
+                ThreadSleep.sleep(500);
+                print.print(Language.getMessage("BTotalRounds", totalRounds));
+                ThreadSleep.sleep(500);
+                print.print(Language.getMessage("BPlayerName", playerName));
+                ThreadSleep.sleep(500);
+                print.print(Language.getMessage("BPlayerTeam", playerTeam));
+                ThreadSleep.sleep(500);
+                print.print(Language.getMessage("BEnemyName", enemyName));
+                ThreadSleep.sleep(500);
+                print.print(Language.getMessage("BEnemyTeam", enemyTeam));
+                ThreadSleep.sleep(500);
+                print.print(Language.getMessage("BOutcome", outcome));
+                ThreadSleep.sleep(500);
+                print.print("------");
+                ThreadSleep.sleep(1000);
             }
         } catch (IOException e) {
             System.err.println("Error while reading the BattleLog file. " + e.getMessage());

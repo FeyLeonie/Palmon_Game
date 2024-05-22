@@ -276,7 +276,7 @@ public class Game extends Printing
                 palmon_db.remove(id); // Removing the chosen Palmon out of the database
 
                 ThreadSleep.sleep(500);
-                print(Language.getMessage("GConfirmPalmonID"));
+                print(Language.getMessage("GConfirmPalmonID", Normalizer.normalize(palmon.getName()), id));
             }
             else
             {

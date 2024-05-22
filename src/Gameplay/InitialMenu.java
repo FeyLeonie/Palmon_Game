@@ -1,5 +1,6 @@
 package Gameplay;
 
+import tools.Language;
 import tools.Printing;
 import tools.Normalizer;
 import tools.ThreadSleep;
@@ -9,19 +10,8 @@ import tools.ThreadSleep;
  * It allows the player to choose their language, enter their name, and the opponent's name.
  * The software runtime complexity for each method is denoted in Big O notation.
  */
-public class InitialMenu extends Thread {
-
-    /**
-     * The Palmon logo displayed at the start of the game
-     */
-    public final String palmon_logo =
-            "███████     ████     ███       ███      ███      ██████     ███     ██\n" +
-                    "██   ████   ████     ███       ████    ████    ███   ████   ████    ██\n" +
-                    "██    ███  ██████    ███       ██████ █████   ███     ███   █████   ██\n" +
-                    "████████  ███  ███   ███       ███ ████  ██   ██       ███  ██  ███ ██\n" +//
-                    "██        ████████   ███       ███  ██   ██   ███     ███   ██   █████\n" +//
-                    "██       ███    ███  ████████  ███       ██    ████ █████   ██    ████\n" +
-                    "██      ███      ███ ████████  ███       ██      █████      ██     ███";
+public class InitialMenu extends Thread
+{
 
     /**
      * The chosen language (1 for English, 2 for German)
@@ -67,6 +57,8 @@ public class InitialMenu extends Thread {
             }
         } while (language != 1 && language != 2);
 
+        Language.configureLanguage(language);
+
         print.print("███████     ████     ███       ███      ███      ██████     ███     ██");
         ThreadSleep.sleep(250);
         print.print("██   ████   ████     ███       ████    ████    ███   ████   ████    ██");
@@ -84,11 +76,9 @@ public class InitialMenu extends Thread {
         ThreadSleep.sleep(1000);
 
         // Welcome message
-        print.print("\nWelcome to Palmon");
+        print.print(Language.getMessage("IMWelcome"));
         ThreadSleep.sleep(1000);
-        print.print("In this arena, strength is the only language spoken!");
-        ThreadSleep.sleep(1000);
-        print.print("Let the combat begin...");
+        print.print(Language.getMessage("IMCombatBegin"));
 
         ThreadSleep.sleep(1000);
 
@@ -102,9 +92,9 @@ public class InitialMenu extends Thread {
         ThreadSleep.sleep(1000);
 
         // Display preparation message
-        print.print("\nLet's not waste any more time.");
+        print.print(Language.getMessage("IMNoTimeWaste"));
         ThreadSleep.sleep(1000);
-        print.print("Prepare yourself, and let the battle against " + enemyName + " begin, " + playerName + "!");
+        print.print(Language.getMessage("IMBattleStart", enemyName, playerName));
 
         ThreadSleep.sleep(1500);
     }
@@ -116,11 +106,11 @@ public class InitialMenu extends Thread {
     public void getPlayerName()
     {
         while (playerName.equals("")) {
-            playerName = print.printWithScString("\nWhat's your name, warrior?", playerName);
+            playerName = print.printWithScString(Language.getMessage("IMAskPlayerName"), playerName);
             playerName = Normalizer.normalize(playerName); // Normalize the player's name
 
             if (playerName.isEmpty()) {
-                print.print("Please type in a name. Numbers will be removed.");
+                print.print(Language.getMessage("IMWrongPlayerName"));
             }
         }
     }
@@ -133,14 +123,14 @@ public class InitialMenu extends Thread {
     {
         while (enemyName.equals(""))
         {
-            print.print("\nAlright, " + playerName);
+            print.print(Language.getMessage("IMAlrightPlayer", playerName));
             ThreadSleep.sleep(1);
-            enemyName = print.printWithScString("What's the name of your opponent?", enemyName);
+            enemyName = print.printWithScString(Language.getMessage("IMOpponentName"), enemyName);
             enemyName = Normalizer.normalize(enemyName); // Normalize the opponent's name
 
             if (enemyName.isEmpty())
             {
-                print.print("Please type in a name. Numbers will be removed.");
+                print.print(Language.getMessage("IMWrongOpponentName"));
             }
         }
     }

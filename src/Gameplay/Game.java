@@ -2,6 +2,7 @@ package Gameplay;
 
 import csv_handling.CSV_Reader;
 import csv_handling.CSV_Searching;
+import tools.Language;
 import tools.Normalizer;
 import tools.Printing;
 import elements.Palmon;
@@ -62,7 +63,7 @@ public class Game extends Printing
     public void teamSettings(CSV_Searching searching, Fight fight)
     {
         // Team Settings Palmons Player
-        print("\n" + InitialMenu.playerName + ", you are now in the team settings.");
+        print(Language.getMessage("GWelcomeTeamSettings", InitialMenu.playerName));
         ThreadSleep.sleep(1500);
 
         // asking for Players Teamsize
@@ -70,12 +71,12 @@ public class Game extends Printing
         do
         {
             // I chose an upper bound of 100 Palmons for max amout of Palmons in a Team since more is not realistic (and 100 is even very much)
-            playersize = printWithScIntUpperBound("How many Palmons would you like to have in your team, " +InitialMenu.playerName+ "?", playersize, 100);
+            playersize = printWithScIntUpperBound(Language.getMessage("GPlayerSize"), playersize, 100);
 
             // testing, if Input was invalid
             if(playersize == 0)
             {
-                print("Please type in a number between 1 and 100."); // if Input was invalid, remind the User what he can type in
+                print(Language.getMessage("GWrongPalmonAmount")); // if Input was invalid, remind the User what he can type in
             }
 
         }while(playersize == 0); // round starts again if Input was invalid
@@ -84,11 +85,11 @@ public class Game extends Printing
         int answer = 0;
         do
         {
-            answer = printWithScInt("\nDo you want to assign a Level Range for your Palmons and the Palmons from " +InitialMenu.enemyName+ "? \n(1) yes \n(2) no", answer);
+            answer = printWithScInt(Language.getMessage("GAskForLevelRange"), answer);
 
             if(answer != 1 && answer != 2)
             {
-                print("Please type in (1) for yes and (2) for no.");
+                print(Language.getMessage("GWrongLevelRangeAnswer"));
             }
         }
         while(answer != 1 && answer != 2);
@@ -104,16 +105,16 @@ public class Game extends Printing
             {
                 // the Level Range must be at least 20 to make sure that Moves can be found
                 // Working with 0-10 to make it easier for the User, Multiplying it with 10 later on to get the correct value
-                minimumLevel = printWithScInt("\nPlease choose the Minimum Level between 0-8", minimumLevel); // Let the User choose a Level between 0 and 8
+                minimumLevel = printWithScInt(Language.getMessage("GAskForMinimumLevel"), minimumLevel); // Let the User choose a Level between 0 and 8
 
                 if(minimumLevel > 8) // MinimumLevel must not be above 8 (8*10 will be 80 later on and Level Range must be 20 so Max could be 100 with Min 80) to make sure Level Range can be at least 20 since Max Level is 100
                 {
-                    print("Please choose a number between 1 and 8."); // remind the User what values are possible
+                    print(Language.getMessage("GWrongMinLevel")); // remind the User what values are possible
                 }
             }while(minimumLevel > 8);
 
             ThreadSleep.sleep(1000);
-            maximumLevel = printWithScIntUpperLowerBound("Please choose the Maximum Level. It has to be between " +(minimumLevel+2)+ " and 10.", maximumLevel, 10, minimumLevel+2);
+            maximumLevel = printWithScIntUpperLowerBound(Language.getMessage("GAskForMaximumLevel", (minimumLevel+2)), maximumLevel, 10, minimumLevel+2);
 
             // Setting the Level to the correct value
             minimumLevel *= 10;
@@ -125,11 +126,11 @@ public class Game extends Printing
         int selection = 0;
         do
         {
-            selection = printWithScInt("\nHow do you want to assemble your team? \n(1) randomly \n(2) by id \n(3) by type", selection);
+            selection = printWithScInt(Language.getMessage("GAskForTeamAssemblingMethod"), selection);
 
             if(selection != 1 && selection != 2 && selection != 3)
             {
-                print("Please type in (1) for random selection (2) for selection by id (2) for selection by type");
+                print(Language.getMessage("GWrongAssemblingInput"));
             }
         }while(selection != 1 && selection != 2 && selection != 3);
 
@@ -156,7 +157,7 @@ public class Game extends Printing
         // Team Settings Palmons Enemy
         ThreadSleep.sleep(1000);
         int enemysize = 0;
-        enemysize = printWithScIntUpperBound("How many Palmons would you like in the team from " + InitialMenu.enemyName+ "? \n(0) randomly \n(type in your preferred number)", enemysize, 100);
+        enemysize = printWithScIntUpperBound(Language.getMessage("GEnemySize", InitialMenu.enemyName), enemysize, 100);
 
         while(enemysize == 0) // no if because Random could randomly choose 0 -> another round would be needed
         {
@@ -166,7 +167,7 @@ public class Game extends Printing
             // O(1)
             if(enemysize != 0 && enemysize <= 100)
             {
-                print(enemysize + " Palmons will be fighting in your opponent's team, " + InitialMenu.enemyName+ "!");
+                print(Language.getMessage("GPrintOutEnemySize", enemysize, InitialMenu.enemyName));
             }
             else
             {
@@ -182,7 +183,7 @@ public class Game extends Printing
         HashMap<Integer, ArrayList<Move>> enemiesPalMoves = setMovesForPalmon(data, enemyPalmons, includeLevel);
 
         ThreadSleep.sleep(1000);
-        print("Your team is set, " +InitialMenu.playerName+ ". Prepare for battle against " +InitialMenu.enemyName+ "!\n");
+        print(Language.getMessage("GTeamCollectionDone", InitialMenu.enemyName));
 
         ThreadSleep.sleep(1000);
 
@@ -261,7 +262,7 @@ public class Game extends Printing
         while(team.getQueueSize() < teamsize)
         {
             ThreadSleep.sleep(500);
-            id = printWithScInt("select your next Palmon by tiping your preferred ID", id);
+            id = printWithScInt(Language.getMessage("GAskForPalmonID"), id);
 
             if(palmon_db.containsKey(id)) // if a Palmon with the preferred ID exists
             {
@@ -275,12 +276,12 @@ public class Game extends Printing
                 palmon_db.remove(id); // Removing the chosen Palmon out of the database
 
                 ThreadSleep.sleep(500);
-                print("Palmon " +Normalizer.normalize(palmon.getName())+ " with your preferred ID " +palmon.getId()+ " was put in your team.");
+                print(Language.getMessage("GConfirmPalmonID"));
             }
             else
             {
                 ThreadSleep.sleep(500);
-                print("No Palmon with preferred ID. Please choose a different ID");
+                print(Language.getMessage("GNoPalmonWithIDFound"));
             }
         }
         return team;
@@ -308,7 +309,7 @@ public class Game extends Printing
 
         for(int i = 1; i <= teamsize; i++)
         {
-            print("\nPossible types to choose from:");
+            print(Language.getMessage("GPossibleTypes"));
 
             HashSet<String> types = searching.saveAllPalmonTypes(data);
 
@@ -326,27 +327,27 @@ public class Game extends Printing
             while(!typeExists)
             {
                 ThreadSleep.sleep(1000);
-                type = printWithScString("\nWhat type should the " + i + ". Palmon be? (please type in the name)", type);
+                type = printWithScString(Language.getMessage("GAskForType", i), type);
 
                 type = type.toLowerCase();
                 typeExists = types.contains(type);
 
                 if(!typeExists)
                 {
-                    print("type was not found. Please try again.");
+                    print(Language.getMessage("GNoTypeFound"));
                 }
             }
 
             HashMap<String, Palmon> selected_type = searching.sortByPalmonType(type, data);
             HashSet<String> palmon_names = new HashSet<>(selected_type.keySet()); // Speichern aller Keys der HashMap, also die Namen aller Palmons
 
-            print("\nPossible Palmons to choose from:");
+            print(Language.getMessage("GPossiblePalmonsToChooseFrom"));
             int count = 0; // counter auf 0 setzen
             for(String name: palmon_names)
             {
                 if(count <= 15) // if 15 names have been output, it will stop to avoid overwhelming the user.
                 {
-                    ThreadSleep.sleep(500);
+                    ThreadSleep.sleep(250);
                     print(Normalizer.normalize(name));
                     count++;
                 }
@@ -362,15 +363,15 @@ public class Game extends Printing
             while(!decisionCorrect)
             {
                 ThreadSleep.sleep(1000);
-                print("These are 15 Palmons of the desired type " +Normalizer.normalize(type));
+                print(Language.getMessage("G15PalsDesiredType", Normalizer.normalize(type)));
                 ThreadSleep.sleep(1000);
-                decision = printWithScString("Choose one (by entering its name).", decision);
+                decision = printWithScString(Language.getMessage("GChooseType"), decision);
                 decision = decision.toLowerCase();
                 decisionCorrect = palmon_names.contains(decision);
 
                 if(!decisionCorrect)
                 {
-                    print("No Palmon with the Name " +Normalizer.normalize(decision)+ " found. Please try again.");
+                    print(Language.getMessage("GNoPalmonWithTypeFound", Normalizer.normalize(decision)));
                 }
             }
 

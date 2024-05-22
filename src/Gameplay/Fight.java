@@ -2,6 +2,7 @@ package Gameplay;
 
 import csv_handling.BattleDocumentation;
 import csv_handling.CSV_Reader;
+import tools.Language;
 import tools.Normalizer;
 import tools.Printing;
 import data_structures.Queue;
@@ -56,42 +57,42 @@ public class Fight extends Printing
     public void FightOverview(Queue<Palmon> playerPalmons, Queue<Palmon> enemyPalmons, HashMap<Integer, ArrayList<Move>> enemiesPalMoves, HashMap<Integer, ArrayList<Move>> playersPalMoves)
     {
         // Introducing the Fight
-        print("Welcome to the arena, " + InitialMenu.playerName + ". Prepare to fight against " + InitialMenu.enemyName);
+        print(Language.getMessage("FWelcomeToArena", InitialMenu.playerName, InitialMenu.enemyName));
         ThreadSleep.sleep(1000);
-        print("May the best Palmon win.");
+        print(Language.getMessage("FBestPalWin"));
 
-        // initializing the Queues where the defeated Palmons will be saved in
+        // initializing the ArrayLists where the defeated Palmons will be saved in
         playersPalmonssArr = playerPalmons.toArrayList();
         enemiesPalmonssArr = enemyPalmons.toArrayList();
 
-        Palmon playerPalmon = playerPalmons.dequeue(); // load first Palmon into the Fight
-        Palmon enemyPalmon = enemyPalmons.dequeue(); // load first Palmon into the Fight
+        // loading the first Palmons into the Fight
+        Palmon playerPalmon = playerPalmons.dequeue();
+        Palmon enemyPalmon = enemyPalmons.dequeue();
 
-        String playerPalmonName = Normalizer.normalize(playerPalmon.getName());
-        String enemyPalmonName = Normalizer.normalize(enemyPalmon.getName());
+        // for saving the Name of the current Palmon from the Player/Enemy
+        String playerPalmonName;
+        String enemyPalmonName;
+
+        ThreadSleep.sleep(1000);
 
         while(playerPalmon != null && enemyPalmon != null)
         {
-            playerPalmonName = Normalizer.normalize(playerPalmonName);
-            enemyPalmonName = Normalizer.normalize(enemyPalmonName);
-            ThreadSleep.sleep(1000);
+            // saving the Name of the current Palmon from the Player/Enemy
+            playerPalmonName = Normalizer.normalize(playerPalmon.getName());
+            enemyPalmonName = Normalizer.normalize(enemyPalmon.getName());
 
+            // Calling a new Round
             round++;
-            print("\nThe " +round+ ". round is about to start!");
+            print(Language.getMessage("FCallNewRound", round));
             ThreadSleep.sleep(1000);
 
-            print("The Palmons are in the arena and ready.");
-            ThreadSleep.sleep(2000);
-
-            print(playerPalmonName+ ", the Palmon from " +InitialMenu.playerName+" faces off against " +enemyPalmonName+ ", the Palmon from " +InitialMenu.enemyName+ ". Let the battle begin!\n");
+            print(Language.getMessage("FFacingOff", playerPalmonName, InitialMenu.playerName, enemyPalmonName, InitialMenu.enemyName));
             ThreadSleep.sleep(2000);
 
             Move enemyMove = chooseMoveEnemy(enemyPalmon, enemiesPalMoves);
             Move playerMove = chooseMovePlayer(playerPalmon, enemyPalmon, playersPalMoves);
 
-            ThreadSleep.sleep(1000);
-
-            if(enemyMove == null && playerMove == null)
+            if(enemyMove == null && playerMove == null) // If both Palmons are blocked since they dont have any Moves to perform they will be defeated
             {
                 print("Both Palmons " +Normalizer.normalize(playerPalmon.getName())+ " and " +Normalizer.normalize(enemyPalmon.getName())+ " are blocked since they dont have a Move. They will be defeated.");
                 playerPalmon.adjustHp(10000.0);
@@ -103,14 +104,14 @@ public class Fight extends Printing
                 {
                     //Player starts attacking
                     ThreadSleep.sleep(1000);
-                    print("\nYour Palmon " +playerPalmonName+ " is about to attack " +enemyPalmonName+ ", the Palmon from " +InitialMenu.enemyName+ "!");
+                    print("\nYour Palmon " +playerPalmonName+ " starts attacking " +enemyPalmonName+ "(" +InitialMenu.enemyName+ " Palmon)");
                     enemyPalmon = attackingSequence(playerPalmon, playerMove, enemyPalmon, playersPalMoves, playerMoveIndex);
 
                     if(enemyPalmon.getHp() > 0)
                     {
                         ThreadSleep.sleep(1000);
                         // Enemy starts attacking
-                        print("\nThe Palmon " +enemyPalmonName+ " from " +InitialMenu.enemyName+ " is about to attack your Palmon " +playerPalmonName+ "!");
+                        print("\nThe Palmon " +enemyPalmonName+ " from " +InitialMenu.enemyName+ " is about to attack " +playerPalmonName+ " (Your Palmon)");
                         playerPalmon = attackingSequence(enemyPalmon, enemyMove, playerPalmon, enemiesPalMoves, enemyMoveIndex);
                     }
                     else
@@ -124,7 +125,7 @@ public class Fight extends Printing
                 {
                     ThreadSleep.sleep(1000);
                     // Enemy starts attacking
-                    print("\nThe enemies Palmon " +enemyPalmonName+ " is about to attack! Prepare yourself.");
+                    print("\nThe enemies Palmon " +enemyPalmonName+ " starts to attack! Prepare yourself.");
                     playerPalmon = attackingSequence(enemyPalmon, enemyMove, playerPalmon, enemiesPalMoves, enemyMoveIndex);
 
                     if(playerPalmon.getHp() > 0)
@@ -152,7 +153,7 @@ public class Fight extends Printing
                 ThreadSleep.sleep(500);
                 print("Current Palmon fighting: " +playerPalmonName+ " with " +playerPalmon.getHp()+ " HP left.");
                 ThreadSleep.sleep(500);
-                int palsLeft = 0;
+                int palsLeft;
                 if(playerPalmon.getHp() <= 0) // if current fighting Palmon is defeated
                 {
                     palsLeft = playerPalmons.getQueueSize(); // current team size is the Queue size
@@ -180,6 +181,8 @@ public class Fight extends Printing
                 print("Amount of Palmons left: " +palsLeft);
             }
 
+
+            //TODO ab hier ist es falsch...
             if(playerPalmon.getHp() <= 0) // if Palmon is defeated
             {
                 if(playerPalmons.getQueueSize() == 0) // and if theres no Palmon in the Players Queue anymore
@@ -189,6 +192,7 @@ public class Fight extends Printing
                 }
                 ThreadSleep.sleep(1000);
                 print("\nSince your Palmon " +Normalizer.normalize(playerPalmon.getName())+ " got defeated your next Palmon will take over the Arena now!");
+                //TODO irgendwie ist es hier immer noch das alte Palmon?
                 playerPalmon = playerPalmons.dequeue(); // otherwise: load next Palmon into fight
             }
 
@@ -200,7 +204,7 @@ public class Fight extends Printing
                     break;
                 }
                 ThreadSleep.sleep(1000);
-                print("\nSince the Palmon " +Normalizer.normalize(playerPalmon.getName())+ " from " +InitialMenu.enemyName+ " got defeated the next Palmon will fight now!");
+                print("\nSince the Palmon " +Normalizer.normalize(enemyPalmon.getName())+ " from " +InitialMenu.enemyName+ " got defeated the next Palmon will fight now!");
                 enemyPalmon = enemyPalmons.dequeue(); // otherwise: load next Palmon into fight
             }
             ThreadSleep.sleep(1000);
@@ -224,12 +228,12 @@ public class Fight extends Printing
     public Palmon attackingSequence(Palmon attacker, Move attack, Palmon defender, HashMap<Integer, ArrayList<Move>> moveHashMap, int index)
     {
         // values are temporary
-        double damageFactor = 0; // effectivity factor
-        boolean hits = false;
-        double damage = 0;
+        double damageFactor; // effectivity factor
+        boolean hits;
+        double damage;
 
         String attackerName = Normalizer.normalize(attacker.getName());
-        String defenderName = Normalizer.normalize(defender.getName());;
+        String defenderName = Normalizer.normalize(defender.getName());
 
         if(attack == null)
         {
@@ -251,10 +255,15 @@ public class Fight extends Printing
 
                 if(damage > 0) // damage zero or below zero e.g. if Players defense is higher than the actual attack
                 {
+                    if(damage > defender.getHp())
+                    {
+                        damage = defender.getHp();
+                    }
+
                     defender.adjustHp(damage); // adjusting the defenders HP
 
-                    print("The hit was successful! " + attackerName+ " made " +damage+ " hp damage to " +defenderName);
-                    print(defenderName+ " now has " +defender.getHp()+ " HP left.");
+                    print("The hit was successful! " + attackerName+ " made " +damage+ " HP damage to " +defenderName);
+                    print(defenderName+ " has " +defender.getHp()+ " HP left.");
                 }
             }
             else

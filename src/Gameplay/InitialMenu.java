@@ -1,9 +1,9 @@
 package Gameplay;
 
-import tools.Language;
-import tools.Printing;
-import tools.Normalizer;
-import tools.ThreadSleep;
+import Tools.Language;
+import Tools.Printing;
+import Tools.Normalizer;
+import Tools.ThreadSleep;
 
 /**
  * The {@code InitialMenu} class represents the initial menu of the game.
@@ -35,7 +35,8 @@ public class InitialMenu extends Thread
 
     /**
      * The entry point for running the initial menu.
-     * The software runtime complexity is O(1)
+     *
+     * TSoftware Runtime is O(1)
      */
     public void run() {
         startInitialMenu();
@@ -43,12 +44,13 @@ public class InitialMenu extends Thread
 
     /**
      * Starts the initial menu.
-     * The software runtime complexity is O(n)
+     *
+     *  Software Runtime is O(n)
      */
     public void startInitialMenu() {
         print = new Printing();
 
-        // Choose language (English or Deutsch)
+        // Choose language (English or German)
         do {
             language = print.printWithScInt("Please choose your language. \n(1) English \n(2) German", language);
 
@@ -57,6 +59,7 @@ public class InitialMenu extends Thread
             }
         } while (language != 1 && language != 2);
 
+        // configuring the Language (needed for the properties)
         Language.configureLanguage(language);
 
         print.print("███████     ████     ███       ███      ███      ██████     ███     ██");
@@ -101,14 +104,16 @@ public class InitialMenu extends Thread
 
     /**
      * Prompts the player to enter their name and normalizes it.
-     * The software runtime complexity is O(n)
+     *
+     * Software Runtime is  O(n)
      */
     public void getPlayerName()
     {
-        while (playerName.equals("")) {
+        while (playerName.isEmpty()) {
             playerName = print.printWithScString(Language.getMessage("IMAskPlayerName"), playerName);
             playerName = Normalizer.normalize(playerName); // Normalize the player's name
 
+            // If Player didnt enter a correct name (e.g. if numbers only were entered)
             if (playerName.isEmpty()) {
                 print.print(Language.getMessage("IMWrongPlayerName"));
             }
@@ -117,17 +122,19 @@ public class InitialMenu extends Thread
 
     /**
      * Prompts the player to enter the opponent's name and normalizes it.
-     * The software runtime complexity is O(n)
+     *
+     * Software Runtime is O(n)
      */
     public void getEnemyName()
     {
-        while (enemyName.equals(""))
+        while (enemyName.isEmpty())
         {
             print.print(Language.getMessage("IMAlrightPlayer", playerName));
             ThreadSleep.sleep(1);
             enemyName = print.printWithScString(Language.getMessage("IMOpponentName"), enemyName);
             enemyName = Normalizer.normalize(enemyName); // Normalize the opponent's name
 
+            // If Player didnt enter a correct name (e.g. if numbers only were entered)
             if (enemyName.isEmpty())
             {
                 print.print(Language.getMessage("IMWrongOpponentName"));

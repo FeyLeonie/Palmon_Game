@@ -1,4 +1,4 @@
-package elements;
+package Elements;
 
 /**
  * Represents an ConPalmonMove entity with attributes and behaviors.

@@ -1,4 +1,4 @@
-package tools;
+package Tools;
 
 import java.util.Scanner;
 
@@ -10,14 +10,16 @@ import java.util.Scanner;
 
 public class Printing
 {
-    /** Printing with Scanner for Integer
+    /**
+     * Printing with Scanner for Integer
      * Prompts the user to enter an integer, validating that it is non-negative.
      *
-     * @param input the prompt message displayed to the user
-     * @param scworth the variable to store the user's input
-     * @return the integer value entered by the user
+     * @param input     The prompt message displayed to the user
+     * @param scworth   The variable to store the user's input
      *
-     *  The software runtime complexity for this method is O(1),
+     * @return          The integer value entered by the user
+     *
+     * Software Runtime is O(1),
      */
     public int printWithScInt(String input, int scworth) {
         Scanner sc = new Scanner(System.in);
@@ -43,7 +45,8 @@ public class Printing
         return scworth;
     }
 
-    /** Printing with Scanner for Integer with upper bound
+    /**
+     * Printing with Scanner for Integer with upper bound
      * Prompts the user to enter an integer, validating that it is within the specified upper bound.
      *
      * @param input the prompt message displayed to the user
@@ -51,7 +54,7 @@ public class Printing
      * @param upperbound the maximum allowed value (inclusive)
      * @return the integer value entered by the user
      *
-     * The software runtime complexity for this method is O(1)
+     * Software Runtime is O(1)
      */
     public int printWithScIntUpperBound(String input, int scworth, int upperbound) {
         Scanner sc = new Scanner(System.in);
@@ -82,7 +85,8 @@ public class Printing
         return scworth;
     }
 
-    /** Printing with Scanner for Integer with upper bound and lower bound
+    /**
+     * Printing with Scanner for Integer with upper bound and lower bound
      * Prompts the user to enter an integer, validating that it is within the specified bounds.
      *
      * @param input the prompt message displayed to the user
@@ -91,7 +95,7 @@ public class Printing
      * @param lowerbound the minimum allowed value (inclusive)
      * @return the integer value entered by the user
      *
-     * The software runtime complexity for this method is O(1)
+     * Software Runtime is O(1)
      */
     public int printWithScIntUpperLowerBound(String input, int scworth, int upperbound, int lowerbound) {
         Scanner sc = new Scanner(System.in);
@@ -122,14 +126,15 @@ public class Printing
         return scworth;
     }
 
-    /** Printing with Scanner for String
+    /**
+     * Printing with Scanner for String
      * Prompts the user to enter a string.
      *
      * @param input the prompt message displayed to the user
      * @param scworth the variable to store the user's input
      * @return the string value entered by the user
      *
-     * The software runtime complexity for this method is O(1)
+     * Software Runtime is O(1)
      */
     public String printWithScString(String input, String scworth)
     {
@@ -154,12 +159,13 @@ public class Printing
         return scworth;
     }
 
-    /** Substitute for System.out.println
+    /**
+     * Substitute for System.out.println
      * Prints the given text to the console.
      *
      * @param text is the text that will be printed
      *
-     * The software runtime complexity for this method is O(1)
+     * Software Runtime is O(1)
      */
     public void print(String text)
     {

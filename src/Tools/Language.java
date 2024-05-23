@@ -1,12 +1,12 @@
-package tools;
+package Tools;
 
 import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
 /**
- * Manages the language
- * => English and German
+ * Works as an Language Handler
+ * makes choosing between english and german possible
  */
 public class Language
 {
@@ -32,17 +32,15 @@ public class Language
     }
 
     /**
-     * Retrieves a localized message from the resource bundle.
+     * Gets a localized message from the resource bundle.
      *
-     * @param Key the resource bundle key of the message
-     * @param args        variable amount of values to be dynamically inserted into the message
-     * @return the localized message
+     * @param Key         The resource bundle key of the message
+     * @param args        Variable amount of values to be dynamically inserted into the message
+     * @return            The localized message
      */
     public static String getMessage(String Key, Object... args)
     {
         String pattern = bundle.getString(Key);
-        return MessageFormat.format(pattern, args); //method automatically replaces placeholders like {0} with arguments
+        return MessageFormat.format(pattern, args); // method automatically replaces placeholders like {0} or {1} with the given Objects arguments
     }
-
-    // private Localization(){} // Private constructor to prevent instantiation
 }

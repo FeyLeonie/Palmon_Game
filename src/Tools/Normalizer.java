@@ -1,6 +1,7 @@
-package tools;
+package Tools;
 
-/** Use case: Normalizing Strings
+/**
+ * Use case: Normalizing Strings
  * The {@code Normalizer} class provides a method for normalizing strings.
  * It removes non-alphabetic characters and ensures the first letter is capitalized.
  */

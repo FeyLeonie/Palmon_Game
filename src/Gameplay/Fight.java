@@ -1,15 +1,15 @@
 package Gameplay;
 
-import csv_handling.BattleDocumentation;
-import csv_handling.CSV_Reader;
-import tools.Language;
-import tools.Normalizer;
-import tools.Printing;
-import data_structures.Queue;
-import elements.Effectivity;
-import elements.Move;
-import elements.Palmon;
-import tools.ThreadSleep;
+import CSVHandling.BattleDocumentation;
+import CSVHandling.CSVHandler;
+import Tools.Language;
+import Tools.Normalizer;
+import Tools.Printing;
+import DataStructures.Queue;
+import Elements.Effectivity;
+import Elements.Move;
+import Elements.Palmon;
+import Tools.ThreadSleep;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,7 +21,7 @@ import java.util.Random;
 public class Fight extends Printing
 {
     public Game game;
-    public CSV_Reader data; // CSV_Reader
+    public CSVHandler data; // CSVHandler
 
     // saving the Index of the Move in the ArrayList to update Max Usages
     int playerMoveIndex = 0;
@@ -36,7 +36,7 @@ public class Fight extends Printing
      * @param game The game instance.
      * @param data The CSV reader instance.
      */
-    public Fight(Game game, CSV_Reader data)
+    public Fight(Game game, CSVHandler data)
     {
         this.game = game;
         this.data = data;
@@ -52,7 +52,7 @@ public class Fight extends Printing
      * @param enemiesPalMoves The map containing moves for enemy Palmons.
      * @param playersPalMoves The map containing moves for player Palmons.
      *
-     * Software Runtime Complexity is O(n)
+     * Software Runtime is O(n)
      */
     public void FightOverview(Queue<Palmon> playerPalmons, Queue<Palmon> enemyPalmons, HashMap<Integer, ArrayList<Move>> enemiesPalMoves, HashMap<Integer, ArrayList<Move>> playersPalMoves)
     {
@@ -92,7 +92,10 @@ public class Fight extends Printing
             Move enemyMove = chooseMoveEnemy(enemyPalmon, enemiesPalMoves);
             Move playerMove = chooseMovePlayer(playerPalmon, enemyPalmon, playersPalMoves);
 
-            if(enemyMove == null && playerMove == null) // If both Palmons are blocked since they dont have any Moves to perform they will be defeated
+            double effectivityPlayer = getEffectivity(playerPalmon, enemyPalmon);
+            double effectivityEnemy = getEffectivity(enemyPalmon, playerPalmon);
+
+            if((enemyMove == null && playerMove == null) && (effectivityPlayer == 0 && effectivityEnemy == 0)) // If both Palmons are blocked since they dont have any Moves to perform they will be defeated
             {
                 print(Language.getMessage("FBothPalmonsBlocked", Normalizer.normalize(playerPalmon.getName()), InitialMenu.playerName, Normalizer.normalize(enemyPalmon.getName()), InitialMenu.enemyName));
                 playerPalmon.adjustHp(10000.0);
@@ -125,7 +128,7 @@ public class Fight extends Printing
                 {
                     ThreadSleep.sleep(1000);
                     // Enemy starts attacking
-                    print(Language.getMessage("FMessageEnemyStartsAttacking", enemyPalmonName, InitialMenu.enemyName));
+                    print(Language.getMessage("FEnemyStartsAttacking", enemyPalmonName, InitialMenu.enemyName));
                     playerPalmon = attackingSequence(enemyPalmon, enemyMove, playerPalmon, enemiesPalMoves, enemyMoveIndex);
 
                     if(playerPalmon.getHp() > 0)
@@ -183,7 +186,6 @@ public class Fight extends Printing
             }
 
 
-            //TODO ab hier ist es falsch...
             if(playerPalmon.getHp() <= 0) // if Palmon is defeated
             {
                 if(playerPalmons.getQueueSize() == 0) // and if theres no Palmon in the Players Queue anymore
@@ -192,7 +194,6 @@ public class Fight extends Printing
                     break;
                 }
                 ThreadSleep.sleep(1000);
-                //TODO irgendwie ist es hier immer noch das alte Palmon?
                 playerPalmon = playerPalmons.dequeue(); // otherwise: load next Palmon into fight
                 print(Language.getMessage("FLoadNextPlayerPalmon", Normalizer.normalize(playerPalmon.getName())));
             }
@@ -218,13 +219,13 @@ public class Fight extends Printing
      * @param attacker        The attacking Palmon.
      * @param defender        The defending Palmon.
      *
-     * move            The move used by the attacking Palmon.
-     * palMoves        The map of moves available to the Palmon.
-     * moveIndex       The index of the move in the list.
+     * @param attack          The move used by the attacking Palmon.
+     * @param moveHashMap     The map of moves available to the Palmon.
+     * @param index           The index of the move in the list.
      *
      * @return The updated defending Palmon after the attack.
      *
-     * Software Runtime Complexity is O(1)
+     * Software Runtime is O(1)
      */
     public Palmon attackingSequence(Palmon attacker, Move attack, Palmon defender, HashMap<Integer, ArrayList<Move>> moveHashMap, int index)
     {
@@ -267,6 +268,10 @@ public class Fight extends Printing
 
                     print(Language.getMessage("FDefenderHPLeft", defenderName, defender.getHp()));
                 }
+                else
+                {
+                    print(Language.getMessage("FDamageFactorZero"));
+                }
             }
             else
             {
@@ -284,12 +289,12 @@ public class Fight extends Printing
     /**
      * Chooses a move for the enemy's Palmon.
      *
-     * palmon  The enemy's Palmon.
-     * palMoves The map of moves available to the enemy's Palmon.
+     * @param enemyPalmon       The enemy's Palmon.
+     * @param enemiesPalMoves   The map of moves available to the enemies Palmon.
      *
      * @return The chosen move.
      *
-     * Software Runtime Complexity is O(1)
+     * Software Runtime is O(1)
      */
     public Move chooseMoveEnemy(Palmon enemyPalmon, HashMap<Integer, ArrayList<Move>> enemiesPalMoves)
     {
@@ -303,7 +308,6 @@ public class Fight extends Printing
         }
 
         Random r = new Random();
-        //TODO hier kommt es in ausnahmefällen noch zu einer Exception (siehe Eingabe Hannah)
         int randomMove = r.nextInt(enemiesMoves.size());
 
         Move enemyAttack = enemiesMoves.get(randomMove); // Saving the current Move
@@ -324,14 +328,13 @@ public class Fight extends Printing
     /**
      * Chooses a move for the player's Palmon.
      *
-     * @param playerPalmon The player's Palmon.
-     * @param enemyPalmon  The enemy's Palmon.
-     *
-     * palMoves he map of moves available to the player's Palmon.
+     * @param playerPalmon      The player's Palmon.
+     * @param enemyPalmon       The enemy's Palmon.
+     * @param playersPalMoves   The map of moves available to the Players Palmon.
      *
      * @return The chosen move.
      *
-     * Software Runtime Complexity is O(1)
+     * Software Runtime is O(1)
      */
     public Move chooseMovePlayer(Palmon playerPalmon, Palmon enemyPalmon, HashMap<Integer, ArrayList<Move>> playersPalMoves)
     {
@@ -445,7 +448,7 @@ public class Fight extends Printing
         // Grundgedanke mal auf Deutsch:
         // Ich nehme die geringste Effektivität (es gibt bei Palmons mit mehreren Types ja mehrere zur Auswahl)
 
-        ArrayList<Effectivity> effectivity_db = CSV_Reader.effectivity_db;
+        ArrayList<Effectivity> effectivity_db = CSVHandler.effectivity_db;
 
         String [] attackerTypes = attacker.getTypes();
         String [] targetTypes = defender.getTypes();

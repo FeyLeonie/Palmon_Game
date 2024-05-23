@@ -1,4 +1,4 @@
-package elements;
+package Elements;
 
 /**
  * Represents a Palmon entity with attributes and behaviors.

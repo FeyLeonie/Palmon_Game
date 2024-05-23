@@ -1,7 +1,8 @@
-package tools;
+package Tools;
 
 /**
- * The {@code ThreadSleep} class provides a method to pause the execution of the console for a specified amount of seconds.
+ * The {@code ThreadSleep} class provides a method to pause the execution of the console for a specified amount of milliseconds.
+ *
  * Use case: increasing the User-Experience by not overwhelming the user with too much text at once.
  */
 
@@ -9,9 +10,10 @@ public class ThreadSleep
 {
     /**
      * Pauses the execution for the specified number of seconds.
-     * @param milliseconds the number of seconds to pause
      *
-     * The software runtime complexity for this method is O(1)
+     * @param milliseconds the number of milliseconds to pause
+     *
+     * Software Runtime is O(1)
      */
     public static void sleep(int milliseconds)
     {

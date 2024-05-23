@@ -1,4 +1,4 @@
-package csv_handling;
+package CSVHandling;
 
 /**
  * The CSV interface defines the contract for any class that handles

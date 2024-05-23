@@ -1,6 +1,6 @@
-package elements;
+package Elements;
 
-import tools.Normalizer;
+import Tools.Normalizer;
 
 /**
  * Represents a Palmon entity with attributes and behaviors.

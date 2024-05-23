@@ -1,4 +1,4 @@
-package elements;
+package Elements;
 
 /**
  * Represents an Effectivity entity with attributes and behaviors.

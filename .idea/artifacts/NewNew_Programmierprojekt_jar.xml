@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="NewNew_Programmierprojekt:jar">
+    <output-path>$USER_HOME$/Downloads</output-path>
+    <root id="archive" name="NewNew_Programmierprojekt.jar">
+      <element id="module-output" name="NewNew_Programmierprojekt" />
+    </root>
+  </artifact>
+</component>

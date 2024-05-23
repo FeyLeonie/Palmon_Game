@@ -1,4 +1,4 @@
-package data_structures;
+package DataStructures;
 
 /**
  * A node in a linked list that stores generic data.

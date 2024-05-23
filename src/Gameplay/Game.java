@@ -1,15 +1,15 @@
 package Gameplay;
 
-import csv_handling.CSV_Reader;
-import csv_handling.CSV_Searching;
-import tools.Language;
-import tools.Normalizer;
-import tools.Printing;
-import elements.Palmon;
-import elements.Move;
+import CSVHandling.CSVHandler;
+import CSVHandling.CSVSearching;
+import Tools.Language;
+import Tools.Normalizer;
+import Tools.Printing;
+import Elements.Palmon;
+import Elements.Move;
 
-import data_structures.Queue;
-import tools.ThreadSleep;
+import DataStructures.Queue;
+import Tools.ThreadSleep;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,8 +21,8 @@ import java.util.Random;
  */
 public class Game extends Printing
 {
-    CSV_Reader data; // for reading the CSV
-    CSV_Searching searching; // has some Methods that will be needed
+    CSVHandler data; // for reading the CSV
+    CSVSearching searching; // has some Methods that will be needed
 
     public Queue<Palmon> playerPalmons;
     public Queue<Palmon> enemyPalmons;
@@ -32,10 +32,10 @@ public class Game extends Printing
     /**
      * Constructs a new Game instance.
      *
-     * @param data      the CSV_Reader instance for reading CSV data
-     * @param selection the CSV_Searching instance for searching CSV data
+     * @param data      the CSVHandler instance for reading CSV data
+     * @param selection the CSVSearching instance for searching CSV data
      */
-    public Game(CSV_Reader data, CSV_Searching selection)
+    public Game(CSVHandler data, CSVSearching selection)
     {
         this.data = data;
         this.searching = selection;
@@ -55,12 +55,12 @@ public class Game extends Printing
     /**
      * Manages the team settings for player and enemy, including assembling Palmons and setting the Moves
      *
-     * @param searching the CSV_Searching instance for searching through the CSV_data
+     * @param searching the CSVSearching instance for searching through the CSV_data
      * @param fight     the Fight instance for starting the fight after gameplay settings
      *
      * software runtime is O(n^2)
      */
-    public void teamSettings(CSV_Searching searching, Fight fight)
+    public void teamSettings(CSVSearching searching, Fight fight)
     {
         // Team Settings Palmons Player
         print(Language.getMessage("GWelcomeTeamSettings", InitialMenu.playerName));
@@ -206,7 +206,7 @@ public class Game extends Printing
      */
     public Queue<Palmon> assembleRandomly(int teamsize, Queue<Palmon> team, int minimumLevel, int maximumLevel)
     {
-        HashMap<Integer, Palmon> palmon_db = CSV_Reader.palmon_db;
+        HashMap<Integer, Palmon> palmon_db = CSVHandler.palmon_db;
 
         Random r = new Random();
         int randomIndex;
@@ -253,7 +253,7 @@ public class Game extends Printing
      */
     public Queue<Palmon> assembleById(int teamsize, Queue<Palmon> team, int minimumLevel, int maximumLevel)
     {
-        HashMap<Integer, Palmon> palmon_db = CSV_Reader.palmon_db;
+        HashMap<Integer, Palmon> palmon_db = CSVHandler.palmon_db;
         int id = 0;
 
         Random r = new Random();
@@ -302,7 +302,7 @@ public class Game extends Printing
      *
      * Software runtime is O(n)
      */
-    public Queue<Palmon> assembleByFirstType(int teamsize, CSV_Searching searching, Queue<Palmon> team, int minimumLevel, int maximumLevel)
+    public Queue<Palmon> assembleByFirstType(int teamsize, CSVSearching searching, Queue<Palmon> team, int minimumLevel, int maximumLevel)
     {
         Random r = new Random();
         int randomLevel;
@@ -359,23 +359,24 @@ public class Game extends Printing
 
 
             String decision = "";
-            boolean decisionCorrect = false;
-            while(!decisionCorrect)
+            String validDecision = "";
+            while(validDecision.isEmpty())
             {
                 ThreadSleep.sleep(1000);
                 print(Language.getMessage("G15PalsDesiredType", Normalizer.normalize(type)));
                 ThreadSleep.sleep(1000);
                 decision = printWithScString(Language.getMessage("GChooseType"), decision);
                 decision = decision.toLowerCase();
-                decisionCorrect = palmon_names.contains(decision);
 
-                if(!decisionCorrect)
+                validDecision = palmonWithTypeFound(palmon_names, decision);
+
+                if(validDecision.isEmpty())
                 {
                     print(Language.getMessage("GNoPalmonWithTypeFound", Normalizer.normalize(decision)));
                 }
             }
 
-            Palmon palmon = selected_type.get(decision);
+            Palmon palmon = selected_type.get(validDecision);
 
             if(minimumLevel != 0 || maximumLevel != 0) // if Level Range was wished one of them must be not null
             {
@@ -384,9 +385,34 @@ public class Game extends Printing
             }
 
             team.enqueue(palmon); // putting the desired Palmon in the team Queue
-            CSV_Reader.palmon_db.remove(palmon.getId()); // Removing the chosen Palmon out of the database
+            CSVHandler.palmon_db.remove(palmon.getId()); // Removing the chosen Palmon out of the database
         }
         return team;
+    }
+
+    /**
+     * Examines if the Palmon the User chose exists
+     *
+     * @param palmon_names          HashSet with all the possible Names of the Palmons the Player could choose from
+     * @param decision              String containing the name of the Palmon the Player chose
+     *
+     * @return                      Boolean, true = Palmon Player chose exists and false = Palmon Player chose does not exist
+     *
+     * Software runtime is O(n)
+     */
+    public String palmonWithTypeFound(HashSet<String> palmon_names, String decision)
+    {
+        for(String name: palmon_names)
+        {
+            String tempName = (Normalizer.normalize(name)).toLowerCase();
+
+            if (tempName.equals(decision))
+            {
+                decision = name;
+                return decision;
+            }
+        }
+        return "";
     }
 
     /**
@@ -400,7 +426,7 @@ public class Game extends Printing
      *
      * Software runtime is O(n)
      */
-    public HashMap<Integer, ArrayList<Move>> setMovesForPalmon(CSV_Reader data, Queue<Palmon> palmons, boolean includeLevel)
+    public HashMap<Integer, ArrayList<Move>> setMovesForPalmon(CSVHandler data, Queue<Palmon> palmons, boolean includeLevel)
     {
         ArrayList<Move> palmon_moves; // ArrayList for saving all Moves for the different Palmons
         HashMap<Integer, ArrayList<Move>> palmonMovesDb = new HashMap<>(); // saving the Moves in an ArrayList and connecting that with the Palmons in this HashMap

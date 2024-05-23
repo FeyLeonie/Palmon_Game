@@ -1,8 +1,8 @@
-package csv_handling;
+package CSVHandling;
 
-import tools.Language;
-import tools.Printing;
-import tools.ThreadSleep;
+import Tools.Language;
+import Tools.Printing;
+import Tools.ThreadSleep;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -21,7 +21,7 @@ public class BattleDocumentation extends Printing
      * Checks if the log file exists and creates it if needed.
      * It also counts the number of battles recorded in the file.
      *
-     * software complexity is O(n)
+     * Software Runtime is O(n)
      */
     public static void initializeLogFile() {
         File file = new File(fileName);
@@ -66,7 +66,7 @@ public class BattleDocumentation extends Printing
      * @param enemyTeam The team of the enemy.
      * @param outcome The outcome of the battle.
      *
-     * software complexity is O(1)
+     * Software Runtime is O(1)
      */
     public static void logBattle(int totalRounds, String playerName, ArrayList<String> playerTeam, String enemyName, ArrayList<String> enemyTeam, String outcome) {
         battleCount++; // increasing the battleCount by one since another round was played
@@ -90,7 +90,7 @@ public class BattleDocumentation extends Printing
      * @param convertingList The ArrayList to be converted.
      * @return A string representation of the ArrayList suitable for CSV.
      *
-     * software complexity is O(n), where n is the number of elements in the ArrayList.
+     * Software Runtime is O(n)
      */
     public static String convertArrayList(ArrayList<String> convertingList) {
         StringBuilder output = new StringBuilder();
@@ -108,7 +108,7 @@ public class BattleDocumentation extends Printing
     /**
      * Prints out the battle log for the user.
      *
-     * software complexity is O(n), where n is the number of lines in the file.
+     * Software Runtime is O(n)
      */
     public static void printBattleLog()
     {

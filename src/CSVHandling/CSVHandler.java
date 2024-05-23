@@ -1,9 +1,9 @@
-package csv_handling;
+package CSVHandling;
 
-import elements.ConPalmonMove;
-import elements.Effectivity;
-import elements.Move;
-import elements.Palmon;
+import Elements.ConPalmonMove;
+import Elements.Effectivity;
+import Elements.Move;
+import Elements.Palmon;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -12,17 +12,17 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
- * The CSV_Reader class is responsible for reading CSV files and populating the data structures
+ * The CSVHandler class is responsible for reading CSV files and populating the data structures
  * for Palmons, Moves, and their associated connections (ConPalmonMove) and Effectivities.
  */
-public class CSV_Reader extends Thread implements CSV
+public class CSVHandler extends Thread implements CSV
 {
 
     // Paths
-    String path_palmon = "src/Resources/CSV_Data/palmon.csv"; // Path Palmon
-    String path_move = "src/Resources/CSV_Data/moves.csv";
-    String path_effectivity  = "src/Resources/CSV_Data/effectivity.csv";
-    String path_palmonmove = "src/Resources/CSV_Data/palmon_move.csv";
+    String path_palmon = "src/Resources/CSVData/palmon.csv"; // Path Palmon
+    String path_move = "src/Resources/CSVData/moves.csv";
+    String path_effectivity  = "src/Resources/CSVData/effectivity.csv";
+    String path_palmonmove = "src/Resources/CSVData/palmon_move.csv";
 
     // HashMaps
     public static HashMap <Integer, Palmon> palmon_db = new HashMap <>(); // Storage medium for Palmon, Key: ID
@@ -40,7 +40,7 @@ public class CSV_Reader extends Thread implements CSV
     @Override
     public void run()
     {
-        CSV_Reader reader = new CSV_Reader();
+        CSVHandler reader = new CSVHandler();
         reader.PalmonDataReader();
         reader.MoveDataReader();
         reader.PalmonMoveDataReader();
@@ -49,7 +49,8 @@ public class CSV_Reader extends Thread implements CSV
 
     /**
      * Reads Palmon data from a CSV file and populates the palmon_db HashMap.
-     * software complexity is O(n)
+     *
+     * Software Runtime is O(n)
      */
     public void PalmonDataReader()
     {
@@ -90,7 +91,8 @@ public class CSV_Reader extends Thread implements CSV
 
     /**
      * Reads Move data from the CSV file and populates the move_db HashMap.
-     * software complexity is O(n)
+     *
+     * Software Runtime is O(n)
      */
     public void MoveDataReader()
     {
@@ -130,7 +132,8 @@ public class CSV_Reader extends Thread implements CSV
 
     /**
      * Reads Effectivity data from a CSV file and populates the effectivity_db ArrayList.
-     * software complexity is O(n)
+     *
+     * Software Runtime is O(n)
      */
     public void EffectivityDataReader()
     {
